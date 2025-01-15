@@ -1,2 +1,3 @@
 from .after_execution_message import AfterExecutionMessage
 from .all_done_message import AllDoneMessage
+from .next_move_message import NextMoveMessage
