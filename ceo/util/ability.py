@@ -8,7 +8,7 @@ from langchain_core.language_models import BaseChatModel
 
 from ceo.brain.lm import get_openai_model
 from ceo.prompt import DocstringPrompt
-from ceo.exception.class_method_exception import ClassMethodException
+from ceo.exception.not_a_regular_function_exception import NotARegularFunctionException
 
 log = logging.getLogger('ceo.ability')
 
@@ -72,7 +72,7 @@ def ability(brain: BaseChatModel, cache: bool = True, cache_dir: str = ''):
 
     def check_if_function_is_method(func: Callable) -> Callable:
         if '.' in func.__qualname__:
-            raise ClassMethodException(func)
+            raise NotARegularFunctionException(func)
         return func
 
     if cache_dir in ('', None):
