@@ -16,5 +16,4 @@ class MemoryAugment:
         return None
 
     @abc.abstractmethod
-    def bring_in_memory(self, memory: OrderedDict):
-        pass
+    def bring_in_memory(self, memory: OrderedDict): ...
