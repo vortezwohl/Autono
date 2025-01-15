@@ -148,7 +148,7 @@ To start building your own agent, follow the steps listed.
 5. assign a request to your agent
 
     ```python
-    agent.assign("Here is a sphere with radius of (1 * 9.5 / 2 * 2) cm and pi here is 3.14159, find the area and volume respectively then write the results into a file called 'result.txt'.")
+    agent.assign("Here is a sphere with radius of 9.5 cm and pi here is 3.14159, find the area and volume respectively then write the results into a file called 'result.txt'.")
     ```
 
 6. leave the rest to your agent
@@ -160,6 +160,47 @@ To start building your own agent, follow the steps listed.
 
 > `ceo` also supports multi-agent collaboration scenario, declare a function as agent calling ability with `@agentic(agent: Agent)`, then grant it to an agent. [See example](#multi-agent).
 
+## Observability
+
+To make the working process of agents observable, I provide two hooks, namely `BeforeActionTaken` and `AfterActionTaken`. 
+They allow you to observe and intervene in the decision-making and execution results of each step of the agent's actions. 
+You can obtain and modify the agent's decision results for the next action through the `BeforeActionTaken` hook, 
+while `AfterActionTaken` allows you to obtain and modify the execution results of the actions (the tampered execution results will be part of the agent's memory).
+
+To start using hooks, follow the steps listed.
+
+1. bring in hooks and messages from `CEO`
+
+    ```python
+    from ceo.brain.hook import BeforeActionTaken, AfterActionTaken
+    from ceo.message import BeforeActionTakenMessage, AfterActionTakenMessage
+    ```
+
+2. declare functions and encapsulate them as hooks
+
+    ```python
+    def before_action_taken(agent: Agent, message: BeforeActionTakenMessage):
+        print(f'Agent: {agent.name}, Next move: {message}')
+        return message
+
+    def after_action_taken(agent: Agent, message: AfterActionTakenMessage):
+        print(f'Agent: {agent.name}, Action taken: {message}')
+        return message
+
+    before_action_taken_hook = BeforeActionTaken(before_action_taken)
+    after_action_taken_hook = AfterActionTaken(after_action_taken)
+    ```
+
+    > In these two hook functions, you intercepted the message and printed the information in the message. 
+    Afterwards, you returned the message unaltered to the agent. 
+    Of course, you also have the option to **modify** the information in the message, 
+    thereby achieving intervention in the agent's working process.
+
+3. use hooks during the agent's working process
+
+    ```python
+    agent.assign(...).just_do_it(before_action_taken_hook, after_action_taken_hook)
+    ```
 
 ## Examples
 
@@ -168,19 +209,18 @@ To start building your own agent, follow the steps listed.
     1. Find the surface area and volume of a sphere and write the results into a file.
 
         ```python
-        import logging
-
         from ceo import (
             Agent,
             Personality,
             get_openai_model,
             ability
         )
+        from ceo.brain.hook import BeforeActionTaken, AfterActionTaken
+        from ceo.message import BeforeActionTakenMessage, AfterActionTakenMessage
         from sympy import simplify
         from dotenv import load_dotenv
 
         load_dotenv()
-        logging.getLogger('ceo').setLevel(logging.DEBUG)
 
 
         @ability
@@ -196,31 +236,43 @@ To start building your own agent, follow the steps listed.
             return f'{content} written to {filename}.'
 
 
+        def before_action_taken(agent: Agent, message: BeforeActionTakenMessage):
+            print(f'Agent: {agent.name}, Next move: {message}')
+            return message
+
+
+        def after_action_taken(agent: Agent, message: AfterActionTakenMessage):
+            print(f'Agent: {agent.name}, Action taken: {message}')
+            return message
+
+
         if __name__ == '__main__':
             ceo = Agent(abilities=[calculator, write_file], brain=get_openai_model(), name='CEO', personality=Personality.INQUISITIVE)
             radius = '(10.01 * 10.36 * 3.33 / 2 * 16)'  # 2762.663904
             pi = 3.14159
             output_file = 'result.txt'
             request = f"Here is a sphere with radius of {radius} cm and pi here is {pi}, find the area and volume respectively then write the results into a file called '{output_file}'."
-            result = ceo.assign(request).just_do_it()  # area = 95910378.2949379, volume = 88322713378.13666
-            print(result)
+            result = ceo.assign(request).just_do_it(BeforeActionTaken(before_action_taken), AfterActionTaken(after_action_taken))  # area = 95910378.2949379, volume = 88322713378.13666
+            print(f'Result: {result}')
         ```
 
         ```
         # result.txt
-        Surface Area: 95910378.29 cm², Volume: 88322713378.14 cm³
+        Surface Area: 95910378.2949379 cm²
+        Volume: 88322713378.1367 cm³
         ```
 
         ```
         # stdout
-        [DEBUG] 2025-01-12 01:33:50,780 ceo : Agent: CEO; Expected steps: 4; Request: "Here is a sphere with radius of (10.01 * 10.36 * 3.33 / 2 * 16) cm and pi here is 3.14159, find the area and volume respectively then write the results into a file called 'result.txt'.";
-        [DEBUG] 2025-01-12 01:34:05,491 ceo : Agent: CEO; Memory size: 1; Memory update: I used the calculator ability to evaluate the mathematical expression '(10.01 * 10.36 * 3.33 / 2 * 16)', and the result is 2762.66390400000, which indicates the computed value of the expression.;
-        [DEBUG] 2025-01-12 01:34:12,953 ceo : Agent: CEO; Memory size: 2; Memory update: I used the calculator ability to evaluate the expression '4 * 3.14159 * (2762.66390400000^2)', and the result is 95910378.2949379, which represents the calculated value of the mathematical expression.;
-        [DEBUG] 2025-01-12 01:34:22,476 ceo : Agent: CEO; Memory size: 3; Memory update: I used the calculator ability to evaluate the expression '(4/3) * 3.14159 * (2762.66390400000^3)', and the result shows '88322713378.1367', which indicates the computed volume of a sphere with the given radius.;
-        [DEBUG] 2025-01-12 01:34:34,233 ceo : Agent: CEO; Memory size: 4; Memory update: I used the write_file ability to create or overwrite a file named 'result.txt' with the specified content detailing the surface area and volume. The result confirms that the content was successfully written to the file.;
-        [DEBUG] 2025-01-12 01:34:47,573 ceo : Agent: CEO; Conclusion: Your request has been fully achieved. The calculations for the surface area and volume were performed correctly, and the results were successfully written to the file 'result.txt'.;
-        [DEBUG] 2025-01-12 01:34:47,573 ceo : Agent: CEO; Step count: 4; Time used: 59.79923509992659 seconds;
-        {'success': True, 'conclusion': "Your request has been fully achieved. The calculations for the surface area and volume were performed correctly, and the results were successfully written to the file 'result.txt'.", 'raw_response': "--THOUGHT-PROCESS--  \n(Initial calculation) [Calculate radius]: The radius was calculated as (10.01 * 10.36 * 3.33 / 2 * 16) resulting in 2762.66390400000 cm. (--SUCCESS--)  \n(After: Calculate radius) [Calculate surface area]: The surface area was calculated using the formula '4 * π * r²', yielding 95910378.2949379 cm². (--SUCCESS--)  \n(After: Calculate surface area) [Calculate volume]: The volume was calculated using the formula '(4/3) * π * r³', resulting in 88322713378.1367 cm³. (--SUCCESS--)  \n(After: Calculate volume) [Write results to file]: The results were successfully written to 'result.txt' with the correct surface area and volume. (--SUCCESS--)  \n\nBased on above assessments, here is my conclusion:  \n--CONCLUSION--  \nYour request has been fully achieved. The calculations for the surface area and volume were performed correctly, and the results were successfully written to the file 'result.txt'.  \n--END--", 'misc': {'time_used': 59.79923509992659, 'step_count': 4}}
+        Agent: CEO, Next move: BeforeActionTakenMessage(ability={"ability_name": "calculator", "description": {"brief_description": "The `calculator` function evaluates a mathematical expression provided as a string and returns the simplified result as a float. It is designed to accept a single math expression, ensuring that the input is a valid string representation of a mathematical operation."}, "parameters_required": ["expr"], "returns": "<class 'float'>"}, arguments={'expr': '(10.01 * 10.36 * 3.33 / 2 * 16)'})
+        Agent: CEO, Action taken: AfterActionTakenMessage(ability='calculator', arguments={'expr': '(10.01 * 10.36 * 3.33 / 2 * 16)'}, returns='2762.66390400000', summarization="I used the calculator ability to evaluate the expression '(10.01 * 10.36 * 3.33 / 2 * 16)', and the result is 2762.66390400000, which indicates the simplified result of the mathematical operation.")
+        Agent: CEO, Next move: BeforeActionTakenMessage(ability={"ability_name": "calculator", "description": {"brief_description": "The `calculator` function evaluates a mathematical expression provided as a string and returns the simplified result as a float. It is designed to accept a single math expression, ensuring that the input is a valid string representation of a mathematical operation."}, "parameters_required": ["expr"], "returns": "<class 'float'>"}, arguments={'expr': '4 * 3.14159 * (2762.66390400000^2)'})
+        Agent: CEO, Action taken: AfterActionTakenMessage(ability='calculator', arguments={'expr': '4 * 3.14159 * (2762.66390400000^2)'}, returns='95910378.2949379', summarization="I used the calculator ability to evaluate the expression '4 * 3.14159 * (2762.66390400000^2)', and the result is 95910378.2949379, which represents the simplified calculation of the given mathematical operation.")
+        Agent: CEO, Next move: BeforeActionTakenMessage(ability={"ability_name": "calculator", "description": {"brief_description": "The `calculator` function evaluates a mathematical expression provided as a string and returns the simplified result as a float. It is designed to accept a single math expression, ensuring that the input is a valid string representation of a mathematical operation."}, "parameters_required": ["expr"], "returns": "<class 'float'>"}, arguments={'expr': '(4/3) * 3.14159 * (2762.66390400000^3)'})
+        Agent: CEO, Action taken: AfterActionTakenMessage(ability='calculator', arguments={'expr': '(4/3) * 3.14159 * (2762.66390400000^3)'}, returns='88322713378.1367', summarization="I used the calculator ability to evaluate the expression '(4/3) * 3.14159 * (2762.66390400000^3)', and the result is 88322713378.1367, which represents the simplified value of the mathematical operation.")
+        Agent: CEO, Next move: BeforeActionTakenMessage(ability={"ability_name": "write_file", "description": {"brief_description": "The `write_file` function writes the specified content to a file with the given filename. It takes two parameters: `filename`, which is the name of the file to be created or overwritten, and `content`, which is the string data to be written into the file. Upon successful writing, it returns a confirmation message indicating that the content has been written to the specified file."}, "parameters_required": ["filename", "content"], "returns": "<class 'str'>"}, arguments={'filename': 'result.txt', 'content': 'Surface Area: 95910378.2949379 cm²\nVolume: 88322713378.1367 cm³'})
+        Agent: CEO, Action taken: AfterActionTakenMessage(ability='write_file', arguments={'filename': 'result.txt', 'content': 'Surface Area: 95910378.2949379 cm²\nVolume: 88322713378.1367 cm³'}, returns='Surface Area: 95910378.2949379 cm²\nVolume: 88322713378.1367 cm³ written to result.txt.', summarization="I used the write_file ability to write the specified content about surface area and volume to a file named 'result.txt'. The result confirms that the content was successfully written to the file.")
+        Result: AllDoneMessage(success=True, conclusion="Your request has been fully achieved. The calculations resulted in a surface area of 95910378.2949379 cm² and a volume of 88322713378.1367 cm³, which were successfully written to 'result.txt'.", raw_response="--THOUGHT-PROCESS--  \n(Start) [Calculate radius]: I evaluated the expression '(10.01 * 10.36 * 3.33 / 2 * 16)' and obtained the radius as 2762.66390400000 cm. (--SUCCESS--)  \n(After: Calculate radius) [Calculate surface area]: I evaluated the expression '4 * 3.14159 * (2762.66390400000^2)' and obtained the surface area as 95910378.2949379 cm². (--SUCCESS--)  \n(After: Calculate surface area) [Calculate volume]: I evaluated the expression '(4/3) * 3.14159 * (2762.66390400000^3)' and obtained the volume as 88322713378.1367 cm³. (--SUCCESS--)  \n(After: Calculate volume) [Write results to file]: I wrote the surface area and volume to 'result.txt'. The content was successfully written. (--SUCCESS--)  \n\nBased on above assessments, here is my conclusion:  \n--CONCLUSION--  \nYour request has been fully achieved. The calculations resulted in a surface area of 95910378.2949379 cm² and a volume of 88322713378.1367 cm³, which were successfully written to 'result.txt'.  \n--END--", time_used=62.49354759999551, step_count=4)
         ```
 
 - ### Multi-agent
@@ -228,8 +280,6 @@ To start building your own agent, follow the steps listed.
     1. Ask the suitable agents to find the surface area and volume of a sphere and write the results into a file.
   
         ```python
-        import logging
-
         from sympy import simplify
         from dotenv import load_dotenv
         from ceo import (
@@ -239,19 +289,20 @@ To start building your own agent, follow the steps listed.
             agentic,
             ability
         )
+        from ceo.brain.hook import BeforeActionTaken, AfterActionTaken
+        from ceo.message import BeforeActionTakenMessage, AfterActionTakenMessage
 
         load_dotenv()
-        logging.getLogger('ceo').setLevel(logging.DEBUG)
         model = get_openai_model()
 
 
-        @ability
+        @ability(model)
         def calculator(expr: str) -> float:
             # this function only accepts a single math expression
             return simplify(expr)
 
 
-        @ability
+        @ability(model)
         def write_file(filename: str, content: str) -> str:
             with open(filename, 'w', encoding='utf-8') as f:
                 f.write(content)
@@ -272,14 +323,24 @@ To start building your own agent, follow the steps listed.
             return
 
 
+        def before_action_taken(agent: Agent, message: BeforeActionTakenMessage):
+            print(f'Agent: {agent.name}, Next move: {message}')
+            return message
+
+
+        def after_action_taken(agent: Agent, message: AfterActionTakenMessage):
+            print(f'Agent: {agent.name}, Action taken: {message}')
+            return message
+
+
         if __name__ == '__main__':
             ceo = Agent(abilities=[agent1, agent2], brain=model, name='CEO', personality=Personality.INQUISITIVE)
             radius = '(10.01 * 10.36 * 3.33 / 2 * 16)'  # 2762.663904
             pi = 3.14159
             output_file = 'result.txt'
             request = f"Here is a sphere with radius of {radius} cm and pi here is {pi}, find the area and volume respectively then write the results into a file called '{output_file}'."
-            result = ceo.assign(request).just_do_it()  # area = 95910378.2949379, volume = 88322713378.13666
-            print(result)
+            result = ceo.assign(request).just_do_it(BeforeActionTaken(before_action_taken), AfterActionTaken(after_action_taken))  # area = 95910378.2949379, volume = 88322713378.13666
+            print(f'Result: {result}')
         ```
 
         > In multi-agent collaboration scenario, you can assign different personalities to each distinct agent. For example, in the aforementioned script, Jack's capability is to perform calculations. I want him to try more and explore more, so Jack's personality is set to `Personality.INQUISITIVE`. On the other hand, Taylor's capability is to create and write files. For operations involving interaction with the external file system, I want him to be more cautious, so Taylor's personality is set to `Personality.PRUDENT`.
@@ -292,28 +353,17 @@ To start building your own agent, follow the steps listed.
 
         ```
         # stdout
-        [DEBUG] 2025-01-12 01:41:36,139 ceo : Agent: CEO; Expected steps: 4; Request: "Here is a sphere with radius of (10.01 * 10.36 * 3.33 / 2 * 16) cm and pi here is 3.14159, find the area and volume respectively then write the results into a file called 'result.txt'.";
-        [DEBUG] 2025-01-12 01:41:41,870 ceo : Agent: Jack; Memory brought in: 0;
-        [DEBUG] 2025-01-12 01:41:45,642 ceo : Agent: Jack; Expected steps: 3; Request: "Here is a sphere with radius of (10.01 * 10.36 * 3.33 / 2 * 16) cm and pi here is 3.14159, find the area and volume respectively then write the results into a file called 'result.txt'.";
-        [DEBUG] 2025-01-12 01:41:52,758 ceo : Agent: Jack; Memory size: 1; Memory update: I used the calculator ability to evaluate the expression '(10.01 * 10.36 * 3.33 / 2 * 16)', and the result is '2762.66390400000', which indicates the computed value of the mathematical expression.;
-        [DEBUG] 2025-01-12 01:42:03,734 ceo : Agent: Jack; Memory size: 2; Memory update: I used the calculator ability to evaluate the expression '4 * 3.14159 * (2762.66390400000^2)', and the result shows '95910378.2949379', which indicates the computed value of the mathematical expression.;
-        [DEBUG] 2025-01-12 01:42:10,908 ceo : Agent: Jack; Memory size: 3; Memory update: I used the calculator ability to evaluate the expression '(4/3) * 3.14159 * (2762.66390400000^3)', and the result shows '88322713378.1367', which indicates the computed volume of a sphere with a radius of approximately 2762.66.;
-        [DEBUG] 2025-01-12 01:42:22,210 ceo : Agent: Jack; Conclusion: Your request has not been fully achieved. I successfully calculated the radius, surface area, and volume of the sphere, but there is no record of writing these results into the file 'result.txt'.;
-        [DEBUG] 2025-01-12 01:42:22,210 ceo : Agent: Jack; Step count: 3; Time used: 40.33986619999632 seconds;
-        [DEBUG] 2025-01-12 01:42:29,049 ceo : Agent: CEO; Memory size: 1; Memory update: I used the __AgenticAbility__talk_to_Jack ability to ask Jack for a favor. Jack successfully calculated the radius, surface area, and volume of a sphere based on the given expression, but failed to write the results to 'result.txt', resulting in an incomplete request.;
-        [DEBUG] 2025-01-12 01:42:44,713 ceo : Agent: Tylor; Memory brought in: 1;
-        [DEBUG] 2025-01-12 01:42:47,498 ceo : Agent: Tylor; Expected steps: 1; Request: "Here is a sphere with radius of (10.01 * 10.36 * 3.33 / 2 * 16) cm and pi here is 3.14159, find the area and volume respectively then write the results into a file called 'result.txt'.";
-        [DEBUG] 2025-01-12 01:42:56,955 ceo : Agent: Tylor; Memory size: 2; Memory update: I used the write_file ability to write the specified content about surface area and volume to a file named 'result.txt'. The result confirms that the content was successfully written to the file.;
-        [DEBUG] 2025-01-12 01:43:06,851 ceo : Agent: Tylor; Conclusion: Your request has been fully achieved. The surface area and volume of the sphere were calculated successfully, and the results were written to 'result.txt'.  
-        Results:  
-        Surface Area: 95910378.2949379 cm²  
-        Volume: 88322713378.1367 cm³;
-        [DEBUG] 2025-01-12 01:43:06,851 ceo : Agent: Tylor; Step count: 1; Time used: 22.138400600058958 seconds;
-        [DEBUG] 2025-01-12 01:43:12,070 ceo : Agent: CEO; Memory size: 2; Memory update: I used the __AgenticAbility__talk_to_Tylor ability to ask Tylor for a favor, which involved calculating the surface area and volume of a sphere based on given dimensions. The result indicates success, confirming that the calculations were performed accurately and the results were saved to 'result.txt'.;
-        [DEBUG] 2025-01-12 01:43:20,457 ceo : Agent: CEO; Conclusion: Your request has been fully achieved. The surface area and volume of the sphere were calculated successfully, and the results were written to 'result.txt'.  
-        Results:  
-        Surface Area: 95910378.2949379 cm²  
-        Volume: 88322713378.1367 cm³;
-        [DEBUG] 2025-01-12 01:43:20,457 ceo : Agent: CEO; Step count: 2; Time used: 108.47770960000344 seconds;
-        {'success': True, 'conclusion': "Your request has been fully achieved. The surface area and volume of the sphere were calculated successfully, and the results were written to 'result.txt'.  \nResults:  \nSurface Area: 95910378.2949379 cm²  \nVolume: 88322713378.1367 cm³", 'raw_response': "--THOUGHT-PROCESS--  \n(Initial calculation) [Calculating radius]: I evaluated the expression '(10.01 * 10.36 * 3.33 / 2 * 16)' and obtained '2762.66390400000'. (--SUCCESS--)  \n(Area calculation) [Calculating surface area]: I evaluated the expression '4 * 3.14159 * (2762.66390400000^2)' and obtained '95910378.2949379'. (--SUCCESS--)  \n(Volume calculation) [Calculating volume]: I evaluated the expression '(4/3) * 3.14159 * (2762.66390400000^3)' and obtained '88322713378.1367'. (--SUCCESS--)  \n(Write results) [Writing to file]: Tylor successfully wrote the results to 'result.txt'. (--SUCCESS--)  \n\nBased on above assessments, here is my conclusion:  \n--CONCLUSION--  \nYour request has been fully achieved. The surface area and volume of the sphere were calculated successfully, and the results were written to 'result.txt'.  \nResults:  \nSurface Area: 95910378.2949379 cm²  \nVolume: 88322713378.1367 cm³  \n--END--  ", 'misc': {'time_used': 108.47770960000344, 'step_count': 2}}
+        Agent: CEO, Next move: BeforeActionTakenMessage(ability={"ability_name": "__AgenticAbility__talk_to_Jack", "description": {"brief_description": "Initiates a conversation with \"Jack\" to use its abilities.", "detailed_description": "First, carefully consider and explore Jack's potential abilities in solving your tasks, then, if you need Jack's help, you must tell comprehensively, precisely and exactly what you need Jack to do.", "self_introduction_from_Jack": "My name is Jack. What can I do: I can evaluate mathematical expressions as a calculator and provide the result as a float. Additionally, I have the ability to retrieve my personal information, but this can only be done once.", "hint": "By reading <self_introduction_from_Jack>, you can learn what Jack can do, and then decide whether to initiates a conversation with Jack according to its abilities."}, "parameters_required": [], "returns": "<class 'str'>"}, arguments={'expression': '(10.01 * 10.36 * 3.33 / 2 * 16)'})
+        Agent: Jack, Next move: BeforeActionTakenMessage(ability={"ability_name": "calculator", "description": {"brief_description": "The `calculator` function evaluates a mathematical expression provided as a string and returns the result as a float. It uses the `simplify` function to process the expression and ensure it is correctly computed."}, "parameters_required": ["expr"], "returns": "<class 'float'>"}, arguments={'expr': '(10.01 * 10.36 * 3.33 / 2 * 16)'})
+        Agent: Jack, Action taken: AfterActionTakenMessage(ability='calculator', arguments={'expr': '(10.01 * 10.36 * 3.33 / 2 * 16)'}, returns='2762.66390400000', summarization="I used the calculator ability to evaluate the expression '(10.01 * 10.36 * 3.33 / 2 * 16)', and the result is '2762.66390400000', which indicates the computed value of the mathematical expression.")
+        Agent: Jack, Next move: BeforeActionTakenMessage(ability={"ability_name": "calculator", "description": {"brief_description": "The `calculator` function evaluates a mathematical expression provided as a string and returns the result as a float. It uses the `simplify` function to process the expression and ensure it is correctly computed."}, "parameters_required": ["expr"], "returns": "<class 'float'>"}, arguments={'expr': '4 * 3.14159 * (2762.66390400000^2)'})
+        Agent: Jack, Action taken: AfterActionTakenMessage(ability='calculator', arguments={'expr': '4 * 3.14159 * (2762.66390400000^2)'}, returns='95910378.2949379', summarization="I used the calculator ability to evaluate the expression '4 * 3.14159 * (2762.66390400000^2)', resulting in the value '95910378.2949379'.")
+        Agent: Jack, Next move: BeforeActionTakenMessage(ability={"ability_name": "calculator", "description": {"brief_description": "The `calculator` function evaluates a mathematical expression provided as a string and returns the result as a float. It uses the `simplify` function to process the expression and ensure it is correctly computed."}, "parameters_required": ["expr"], "returns": "<class 'float'>"}, arguments={'expr': '(4/3) * 3.14159 * (2762.66390400000^3)'})
+        Agent: Jack, Action taken: AfterActionTakenMessage(ability='calculator', arguments={'expr': '(4/3) * 3.14159 * (2762.66390400000^3)'}, returns='88322713378.1367', summarization="I used the calculator ability to evaluate the expression '(4/3) * 3.14159 * (2762.66390400000^3)', and the result is 88322713378.1367, which represents the computed volume of a sphere with a radius of approximately 2762.66.")
+        Agent: CEO, Action taken: AfterActionTakenMessage(ability='__AgenticAbility__talk_to_Jack', arguments={'arguments': 'Ask for a favor.'}, returns='{"success": false, "response": "--THOUGHT-PROCESS--  \\n(Initial calculation) [Calculate radius]: I calculated the radius as \'2762.66390400000\' cm. (--SUCCESS--)  \\n(After: Calculate radius) [Calculate surface area]: I calculated the surface area using the formula \'4 * 3.14159 * (2762.66390400000^2)\', resulting in \'95910378.2949379\'. (--SUCCESS--)  \\n(After: Calculate surface area) [Calculate volume]: I calculated the volume using the formula \'(4/3) * 3.14159 * (2762.66390400000^3)\', resulting in \'88322713378.1367\'. (--SUCCESS--)  \\n(After: Calculate volume) [Write results to file]: There is no record in <history> indicating that the results were written to \'result.txt\'. (--FAILED--)  \\n\\nBased on above assessments, here is my conclusion:  \\n--CONCLUSION--  \\nYour request has not been fully achieved. I calculated the radius as \'2762.66390400000\' cm, the surface area as \'95910378.2949379\', and the volume as \'88322713378.1367\', but the results were not written to \'result.txt\'.  \\n--END--"}', summarization="I used the __AgenticAbility__talk_to_Jack ability to ask Jack for a favor. Jack calculated the radius, surface area, and volume of a sphere, but failed to write the results to 'result.txt'.")
+        Agent: CEO, Next move: BeforeActionTakenMessage(ability={"ability_name": "__AgenticAbility__talk_to_Tylor", "description": {"brief_description": "Initiates a conversation with \"Tylor\" to use its abilities.", "detailed_description": "First, carefully consider and explore Tylor's potential abilities in solving your tasks, then, if you need Tylor's help, you must tell comprehensively, precisely and exactly what you need Tylor to do.", "self_introduction_from_Tylor": "My name is Tylor. What can I do: I can write content to a file and provide my personal information upon request, but the latter can only be used once.", "hint": "By reading <self_introduction_from_Tylor>, you can learn what Tylor can do, and then decide whether to initiates a conversation with Tylor according to its abilities."}, "parameters_required": [], "returns": "<class 'str'>"}, arguments={'file_name': 'result.txt', 'content': 'Surface Area: 95910378.2949379 cm²\nVolume: 88322713378.1367 cm³'})
+        Agent: Tylor, Next move: BeforeActionTakenMessage(ability={"ability_name": "write_file", "description": {"brief_description": "The `write_file` function writes the specified content to a file with the given filename. It opens the file in write mode, encodes the content in UTF-8, and returns a confirmation message indicating that the content has been successfully written to the file."}, "parameters_required": ["filename", "content"], "returns": "<class 'str'>"}, arguments={'filename': 'result.txt', 'content': 'Surface Area: 95910378.2949379 cm²\nVolume: 88322713378.1367 cm³'})
+        Agent: Tylor, Action taken: AfterActionTakenMessage(ability='write_file', arguments={'filename': 'result.txt', 'content': 'Surface Area: 95910378.2949379 cm²\nVolume: 88322713378.1367 cm³'}, returns='Surface Area: 95910378.2949379 cm²\nVolume: 88322713378.1367 cm³ written to result.txt.', summarization="I used the write_file ability to write the specified content about surface area and volume to a file named 'result.txt'. The result confirms that the content was successfully written to the file.")
+        Agent: CEO, Action taken: AfterActionTakenMessage(ability='__AgenticAbility__talk_to_Tylor', arguments={'arguments': 'Ask for a favor.'}, returns='{"success": true, "response": "--THOUGHT-PROCESS--  \\n(Initial calculation) [Calculate radius]: The radius was calculated as \'2762.66390400000\' cm. (--SUCCESS--)  \\n(After: Calculate radius) [Calculate surface area]: The surface area was calculated using the formula \'4 * 3.14159 * (2762.66390400000^2)\', resulting in \'95910378.2949379\'. (--SUCCESS--)  \\n(After: Calculate surface area) [Calculate volume]: The volume was calculated using the formula \'(4/3) * 3.14159 * (2762.66390400000^3)\', resulting in \'88322713378.1367\'. (--SUCCESS--)  \\n(After: Calculate volume) [Write results to file]: The results were successfully written to \'result.txt\'. (--SUCCESS--)  \\n\\nBased on above assessments, here is my conclusion:  \\n--CONCLUSION--  \\nYour request has been fully achieved. The radius was calculated as \'2762.66390400000\' cm, the surface area as \'95910378.2949379\' cm², and the volume as \'88322713378.1367\' cm³. The results were successfully written to \'result.txt\'.  \\n--END--  "}', summarization="I used the __AgenticAbility__talk_to_Tylor ability to ask Tylor for a favor, which involved calculating the radius, surface area, and volume of a sphere. The results were successfully computed and written to 'result.txt'.")
+        Result: AllDoneMessage(success=True, conclusion="Your request has been fully achieved. The radius was calculated as '2762.66390400000' cm, the surface area as '95910378.2949379' cm², and the volume as '88322713378.1367' cm³. The results were successfully written to 'result.txt'.", raw_response="--THOUGHT-PROCESS--  \n(Initial calculation) [Calculate radius]: The radius was calculated as '2762.66390400000' cm. (--SUCCESS--)  \n(After: Calculate radius) [Calculate surface area]: The surface area was calculated using the formula '4 * 3.14159 * (2762.66390400000^2)', resulting in '95910378.2949379' cm². (--SUCCESS--)  \n(After: Calculate surface area) [Calculate volume]: The volume was calculated using the formula '(4/3) * 3.14159 * (2762.66390400000^3)', resulting in '88322713378.1367' cm³. (--SUCCESS--)  \n(After: Calculate volume) [Write results to file]: The results were successfully written to 'result.txt'. (--SUCCESS--)  \n\nBased on above assessments, here is my conclusion:  \n--CONCLUSION--  \nYour request has been fully achieved. The radius was calculated as '2762.66390400000' cm, the surface area as '95910378.2949379' cm², and the volume as '88322713378.1367' cm³. The results were successfully written to 'result.txt'.  \n--END--  ", time_used=123.79718699998921, step_count=2)
         ```
