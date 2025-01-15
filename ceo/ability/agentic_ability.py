@@ -35,24 +35,25 @@ class AgenticAbility(Ability):
                 "hint": f"By reading <self_introduction_from_{agent.name}>, you can learn what {agent.name} can do, "
                         f"and then decide whether to initiates a conversation with {agent.name} "
                         "according to its abilities.",
-                "parameters": [{
-                    "request": {
-                        "name": "request",
-                        "type": "str",
-                        "description": f"A brief instruction to be processed by {agent.name}."
-                    },
-                    "request_by_step": {
-                        "name": "request_by_step",
-                        "type": "str",
-                        "description": "A comprehensive, precise and exact instruction "
-                                       f"to be processed by {agent.name}."
-                    },
-                    "memory": {
-                        "name": "memory",
-                        "type": "dict",
-                        "description": "/"
-                    }
-                }],
+                "parameters": [],
+                # "parameters": [{
+                #     "request": {
+                #         "name": "request",
+                #         "type": "str",
+                #         "description": f"A brief instruction to be processed by {agent.name}."
+                #     },
+                #     "request_by_step": {
+                #         "name": "request_by_step",
+                #         "type": "str",
+                #         "description": "A comprehensive, precise and exact instruction "
+                #                        f"to be processed by {agent.name}."
+                #     },
+                #     "memory": {
+                #         "name": "memory",
+                #         "type": "dict",
+                #         "description": "/"
+                #     }
+                # }],
                 "returns": {
                     "type": "str",
                     "description": f"{agent.name}'s response to your instruction."
@@ -63,7 +64,11 @@ class AgenticAbility(Ability):
         log.debug(f'Agent dispatcher generated. {self.__name__}: {self.__doc__}')
 
     @override
-    def __call__(self, request: str, request_by_step: str, memory: OrderedDict, *args, **kwargs) -> str:
+    def __call__(self, *args, **kwargs) -> str:
+        _do_nothing = 'Do nothing.'
+        request = kwargs.get('request', _do_nothing)
+        request_by_step = kwargs.get('request_by_step', _do_nothing)
+        memory = kwargs.get('memory', OrderedDict())
         before_action_taken_hook = kwargs.get('before_action_taken_hook', None)
         after_action_taken_hook = kwargs.get('after_action_taken_hook', None)
         if before_action_taken_hook is None:
