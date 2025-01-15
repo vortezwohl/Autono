@@ -11,7 +11,6 @@ from typing import Callable
 from langchain_core.language_models import BaseChatModel
 
 from ceo.ability.agentic_ability import Ability, PREFIX as AGENTIC_ABILITY_PREFIX
-from ceo.brain.hook.after_execution_hook import AfterExecutionHook
 from ceo.message.all_done_message import AllDoneMessage
 from ceo.prompt import (
     SchedulerPrompt,
@@ -208,4 +207,4 @@ class BaseAgent:
         return ''
 
     @abc.abstractmethod
-    def just_do_it(self, after_execution_hook: AfterExecutionHook | Callable = AfterExecutionHook.do_nothing()) -> AllDoneMessage: ...
+    def just_do_it(self, *args, **kwargs) -> AllDoneMessage: ...
