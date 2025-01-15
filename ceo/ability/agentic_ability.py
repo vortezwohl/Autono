@@ -64,9 +64,12 @@ class AgenticAbility(Ability):
 
     @override
     def __call__(self, request: str, request_by_step: str, memory: OrderedDict, *args, **kwargs) -> str:
+        before_action_taken_hook = kwargs.get('before_action_taken_hook', None)
         after_action_taken_hook = kwargs.get('after_action_taken_hook', None)
+        if before_action_taken_hook is None:
+            before_action_taken_hook = BaseHook.do_nothing()
         if after_action_taken_hook is None:
             after_action_taken_hook = BaseHook.do_nothing()
         self._agent.relay(request_by_step=request_by_step, request=request)
         self._agent.bring_in_memory(memory)
-        return self._agent.just_do_it(after_action_taken_hook).response_for_agent
+        return self._agent.just_do_it(before_action_taken_hook, after_action_taken_hook).response_for_agent

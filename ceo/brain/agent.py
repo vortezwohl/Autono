@@ -127,6 +127,7 @@ class Agent(BaseAgent, MemoryAugment):
                             'request': self._request,
                             'request_by_step': self._request_by_step,
                             'memory': self.memory,
+                            'before_action_taken_hook': __before_action_taken_hook,
                             'after_action_taken_hook': __after_action_taken_hook
                         }
                     __after_execution_msg = ExecutorPrompt(args=args, action=action).invoke(model=self._model)
