@@ -13,8 +13,7 @@ class Prompt:
         self.ext_context = ext_context
 
     @abc.abstractmethod
-    def invoke(self, model: BaseChatModel):
-        pass
+    def invoke(self, model: BaseChatModel): ...
 
     @staticmethod
     def construct_prompt(prompt: str, ext_context: str) -> str:
