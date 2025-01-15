@@ -24,11 +24,7 @@ class ExecutorPrompt(Prompt):
             self.args[_k] = args[_k]
             tmp_args[_k] = args[_k]
         if self.action.name.startswith(AGENTIC_ABILITY_PREFIX):
-            if 'memory' in args and 'memory' in tmp_args.keys():
-                del tmp_args['memory']
-            for _k in args.keys():
-                if 'hook' in _k and _k in tmp_args.keys():
-                    del tmp_args[_k]
+            tmp_args = {'choice': 'Ask for a favor.'}
         prompt = json.dumps({
             "precondition": "Below is an ability shown at <ability> "
                             "and your choice(args) for using the <ability> is shown at <args(choice)>.",
