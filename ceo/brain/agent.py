@@ -1,4 +1,3 @@
-import copy
 import hashlib
 import json
 import logging
@@ -13,8 +12,10 @@ from langchain_core.language_models import BaseChatModel
 
 from ceo.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
 from ceo.brain.base_agent import BaseAgent
+from ceo.brain.hook.after_execution_hook import AfterExecutionHook
 from ceo.brain.memory_augment import MemoryAugment
 from ceo.enum.Personality import Personality
+from ceo.message.after_execution_message import AfterExecutionMessage
 from ceo.prompt import (
     NextMovePrompt,
     ExecutorPrompt,
@@ -86,7 +87,7 @@ class Agent(BaseAgent, MemoryAugment):
         return self.reposition()
 
     @override
-    def just_do_it(self) -> dict:
+    def just_do_it(self, after_execution_hook: AfterExecutionHook = AfterExecutionHook.do_nothing()) -> dict:
         __start_time = time.perf_counter()
         if self.__expected_step < 1:
             self.estimate_step()
@@ -115,7 +116,11 @@ class Agent(BaseAgent, MemoryAugment):
                             'request_by_step': self._request_by_step,
                             'memory': self.memory
                         }
-                    self.memorize(ExecutorPrompt(args=args, action=action).invoke(model=self._model))
+                    self.memorize(
+                        after_execution_hook(
+                            ExecutorPrompt(args=args, action=action).invoke(model=self._model)
+                        )
+                    )
                     self._act_count += 1
                     continue
             brief_conclusion, response = IntrospectionPrompt(
@@ -152,24 +157,25 @@ class Agent(BaseAgent, MemoryAugment):
         self.__expected_step = expected_step
         return self
 
-    def memorize(self, action_taken: dict):
+    def memorize(self, action_taken: AfterExecutionMessage):
+        if action_taken is None:
+            return self
         now = datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S.%f')
-        _action_taken = copy.deepcopy(action_taken)
-        _tmp_summarization = _action_taken['summarization']
-        del _action_taken['summarization']
-        _tmp_action_taken = _action_taken
-        if _tmp_action_taken['ability'].startswith(AGENTIC_ABILITY_PREFIX):
+        _tmp_action_taken = action_taken.to_dict()
+        if 'summarization' in _tmp_action_taken.keys():
+            del _tmp_action_taken['summarization']
+        if _tmp_action_taken.get('ability', str()).startswith(AGENTIC_ABILITY_PREFIX):
             if 'choice' in _tmp_action_taken.keys():
                 _tmp_action_taken['choice'] = 'Ask for a favor.'
         new_memory = {
             "timestamp": now,
             "agent_name": self._name,
-            f"message_from_{self._name}": _tmp_summarization,
+            f"message_from_{self._name}": action_taken.summarization,
             f'action_taken_by_{self._name}': _tmp_action_taken
         }
         mem_hash = hashlib.md5(json.dumps(new_memory, ensure_ascii=False).encode()).hexdigest()
         self._memory[f"agent:[{self._name}] at:[{now}] hash:[{mem_hash}]"] = new_memory
-        log.debug(f'Agent: {self._name}; Memory size: {len(self._memory.keys())}; Memory update: {_tmp_summarization};')
+        log.debug(f'Agent: {self._name}; Memory size: {len(self._memory.keys())}; Memory update: {action_taken.summarization};')
         return self
 
     def stop(self) -> bool:
