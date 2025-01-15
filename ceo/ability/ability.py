@@ -1,5 +1,4 @@
 import asyncio
-import copy
 import inspect
 import json
 import threading
@@ -77,7 +76,7 @@ class Ability:
 
     @property
     def parameters(self) -> dict:
-        return copy.deepcopy(self._parameters)
+        return self._parameters
 
     @property
     def returns(self) -> any:
