@@ -1,4 +1,3 @@
-import copy
 import json
 import logging
 from collections.abc import Iterator
@@ -19,10 +18,17 @@ AFTER_EXECUTION_MESSAGE_KEYS = ('summarization', 'ability', 'choice', 'returns')
 class ExecutorPrompt(Prompt):
     def __init__(self, args: dict, action: Ability, ext_context: str = ''):
         self.action = action
-        self.args = copy.deepcopy(args)
-        tmp_args = copy.deepcopy(self.args)
+        self.args = dict()
+        tmp_args = dict()
+        for _k in args:
+            self.args[_k] = args[_k]
+            tmp_args[_k] = args[_k]
         if self.action.name.startswith(AGENTIC_ABILITY_PREFIX):
-            del tmp_args['memory']
+            if 'memory' in args and 'memory' in tmp_args.keys():
+                del tmp_args['memory']
+            for _k in args.keys():
+                if 'hook' in _k and _k in tmp_args.keys():
+                    del tmp_args[_k]
         prompt = json.dumps({
             "precondition": "Below is an ability shown at <ability> "
                             "and your choice(args) for using the <ability> is shown at <args(choice)>.",
@@ -44,7 +50,7 @@ class ExecutorPrompt(Prompt):
 
     def invoke(self, model: BaseChatModel, max_retry: int = 3) -> AfterExecutionMessage:
         result = self.action.__call__(**self.args)
-        tmp_args = copy.deepcopy(self.args)
+        tmp_args = self.args
         if self.action.name.startswith(AGENTIC_ABILITY_PREFIX):
             tmp_args = {'choice': 'Ask for a favor.'}
         prompt = json.dumps({
