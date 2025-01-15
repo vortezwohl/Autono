@@ -5,7 +5,6 @@ import json
 import logging
 import random
 import time
-import warnings
 from typing import Callable
 
 from langchain_core.language_models import BaseChatModel
@@ -14,8 +13,6 @@ from ceo.ability.agentic_ability import Ability, PREFIX as AGENTIC_ABILITY_PREFI
 from ceo.message.all_done_message import AllDoneMessage
 from ceo.prompt import (
     SchedulerPrompt,
-    AnalyserPrompt,
-    ExecutorPrompt,
     RequestResolverPrompt,
     SelfIntroducePrompt
 )
@@ -178,33 +175,6 @@ class BaseAgent:
         self._request = request
         self._request_by_step = request_by_step
         return self.reposition()
-
-    def __step_quiet(self) -> str:
-        warnings.warn(
-            "This function is deprecated and will be removed in future versions.",
-            DeprecationWarning,
-            stacklevel=2
-        )
-        if self._act_count < len(self.__schedule):
-            combined_request = {
-                'raw_request': self._request,
-                'request_by_step': self._request_by_step
-            }
-            analysing = AnalyserPrompt(
-                request=combined_request,
-                prev_results=self.__prev_results,
-                action=self.__schedule[self._act_count]
-            )
-            action, args = analysing.invoke(self._model)
-            executing = ExecutorPrompt(args=args, action=action)
-            action_str = (f'Agent: {self._name}; Action {self._act_count + 1}/{len(self.__schedule)}: '
-                          f'{json.dumps(executing.invoke(model=self._model), ensure_ascii=False)};')
-            self.__prev_results.append(action_str)
-            self._act_count += 1
-            log.debug(action_str)
-            return action_str
-        self.reposition()
-        return ''
 
     @abc.abstractmethod
     def just_do_it(self, *args, **kwargs) -> AllDoneMessage: ...

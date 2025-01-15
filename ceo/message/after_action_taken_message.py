@@ -16,7 +16,7 @@ class AfterActionTakenMessage(BaseMessage):
     def to_dict(self):
         return {
             'ability': self.ability,
-            'choice': self.arguments,
+            'arguments': self.arguments,
             'returns': self.returns,
             'summarization': self.summarization,
         }
