@@ -1,2 +1,2 @@
-from .after_execution_hook import AfterExecutionHook
-from .next_move_hook import NextMoveHook
+from .after_action_taken import AfterActionTaken
+from .before_action_taken import BeforeActionTaken

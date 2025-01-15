@@ -6,7 +6,7 @@ from langchain_core.language_models import BaseChatModel
 
 from ceo.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
 from ceo.ability.ability import Ability
-from ceo.message.after_execution_message import AfterExecutionMessage
+from ceo.message.after_action_taken_message import AfterActionTakenMessage
 from ceo.exception.too_dumb_exception import TooDumbException
 from ceo.prompt.prompt import Prompt
 
@@ -44,7 +44,7 @@ class ExecutorPrompt(Prompt):
         log.debug(f'ExecutorResponse (before): {resp}')
         return resp
 
-    def invoke(self, model: BaseChatModel, max_retry: int = 3) -> AfterExecutionMessage:
+    def invoke(self, model: BaseChatModel, max_retry: int = 3) -> AfterActionTakenMessage:
         result = self.action.__call__(**self.args)
         tmp_args = self.args
         if self.action.name.startswith(AGENTIC_ABILITY_PREFIX):
@@ -115,7 +115,7 @@ class ExecutorPrompt(Prompt):
                               f'You must strictly follow the json format in <output_format>{count * 2 * exclamation} '
                               f'You should refer to example in <output_example>{count * 2 * exclamation}')
                 tmp_prompt = Prompt.construct_prompt(tmp_prompt, '')
-        return AfterExecutionMessage(
+        return AfterActionTakenMessage(
             ability=res_dict.get('ability'),
             choice=res_dict.get('choice'),
             returns=res_dict.get('returns'),

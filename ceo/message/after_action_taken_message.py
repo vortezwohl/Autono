@@ -6,7 +6,7 @@ from ceo.message.base_massage import BaseMessage
 
 
 @dataclass
-class AfterExecutionMessage(BaseMessage):
+class AfterActionTakenMessage(BaseMessage):
     ability: str
     choice: str | dict
     returns: str

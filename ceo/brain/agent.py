@@ -12,13 +12,13 @@ from langchain_core.language_models import BaseChatModel
 
 from ceo.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
 from ceo.brain.base_agent import BaseAgent
-from ceo.brain.hook.next_move_hook import NextMoveHook
-from ceo.brain.hook.after_execution_hook import AfterExecutionHook
+from ceo.brain.hook.before_action_taken import BeforeActionTaken
+from ceo.brain.hook.after_action_taken import AfterActionTaken
 from ceo.brain.hook.base_hook import BaseHook
 from ceo.brain.memory_augment import MemoryAugment
 from ceo.enum.Personality import Personality
 from ceo.message.all_done_message import AllDoneMessage
-from ceo.message.after_execution_message import AfterExecutionMessage
+from ceo.message.after_action_taken_message import AfterActionTakenMessage
 from ceo.prompt import (
     NextMovePrompt,
     ExecutorPrompt,
@@ -91,14 +91,14 @@ class Agent(BaseAgent, MemoryAugment):
 
     @override
     def just_do_it(self, *args, **kwargs) -> AllDoneMessage:
-        __after_execution_hook: AfterExecutionHook | Callable = BaseHook.do_nothing()
-        __next_move_hook: NextMoveHook | Callable = BaseHook.do_nothing()
+        __after_action_taken_hook: AfterActionTaken | Callable = BaseHook.do_nothing()
+        __before_action_taken_hook: BeforeActionTaken | Callable = BaseHook.do_nothing()
         for _arg in args:
-            if isinstance(_arg, AfterExecutionHook):
-                __after_execution_hook = _arg
-            if isinstance(_arg, NextMoveHook):
-                __next_move_hook = _arg
-        # todo next_move_hook implementation
+            if isinstance(_arg, AfterActionTaken):
+                __after_action_taken_hook = _arg
+            if isinstance(_arg, BeforeActionTaken):
+                __before_action_taken_hook = _arg
+        # todo __before_action_taken_hook implementation
         __start_time = time.perf_counter()
         if self.__expected_step < 1:
             self.estimate_step()
@@ -126,10 +126,10 @@ class Agent(BaseAgent, MemoryAugment):
                             'request': self._request,
                             'request_by_step': self._request_by_step,
                             'memory': self.memory,
-                            'after_execution_hook': __after_execution_hook
+                            'after_action_taken_hook': __after_action_taken_hook
                         }
                     __after_execution_msg = ExecutorPrompt(args=args, action=action).invoke(model=self._model)
-                    self.memorize(__after_execution_hook(self, __after_execution_msg))
+                    self.memorize(__after_action_taken_hook(self, __after_execution_msg))
                     self._act_count += 1
                     continue
             brief_conclusion, response = IntrospectionPrompt(
@@ -164,7 +164,7 @@ class Agent(BaseAgent, MemoryAugment):
         self.__expected_step = expected_step
         return self
 
-    def memorize(self, action_taken: AfterExecutionMessage):
+    def memorize(self, action_taken: AfterActionTakenMessage):
         if action_taken is None:
             return self
         now = datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S.%f')

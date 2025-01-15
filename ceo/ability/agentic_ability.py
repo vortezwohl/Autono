@@ -9,7 +9,7 @@ from ceo.brain.memory_augment import MemoryAugment
 
 PREFIX = '__AgenticAbility__'
 
-from ceo.brain.hook.after_execution_hook import AfterExecutionHook, BaseHook
+from ceo.brain.hook.after_action_taken import BaseHook
 from ceo.brain.base_agent import BaseAgent
 
 log = logging.getLogger('ceo.ability')
@@ -64,9 +64,9 @@ class AgenticAbility(Ability):
 
     @override
     def __call__(self, request: str, request_by_step: str, memory: OrderedDict, *args, **kwargs) -> str:
-        after_execution_hook = kwargs.get('after_execution_hook', None)
-        if after_execution_hook is None:
-            after_execution_hook = BaseHook.do_nothing()
+        after_action_taken_hook = kwargs.get('after_action_taken_hook', None)
+        if after_action_taken_hook is None:
+            after_action_taken_hook = BaseHook.do_nothing()
         self._agent.relay(request_by_step=request_by_step, request=request)
         self._agent.bring_in_memory(memory)
-        return self._agent.just_do_it(after_execution_hook=after_execution_hook).response_for_agent
+        return self._agent.just_do_it(after_action_taken_hook).response_for_agent

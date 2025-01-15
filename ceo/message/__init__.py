@@ -1,3 +1,3 @@
-from .after_execution_message import AfterExecutionMessage
+from .after_action_taken_message import AfterActionTakenMessage
 from .all_done_message import AllDoneMessage
-from .next_move_message import NextMoveMessage
+from .before_action_taken_message import BeforeActionTakenMessage

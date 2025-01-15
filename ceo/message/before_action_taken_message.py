@@ -7,7 +7,7 @@ from ceo.message.base_massage import BaseMessage
 
 
 @dataclass
-class NextMoveMessage(BaseMessage):
+class BeforeActionTakenMessage(BaseMessage):
     ability: Ability
     arguments: dict
 
