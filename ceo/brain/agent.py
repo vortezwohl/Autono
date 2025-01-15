@@ -18,6 +18,7 @@ from ceo.brain.hook.base_hook import BaseHook
 from ceo.brain.memory_augment import MemoryAugment
 from ceo.enum.Personality import Personality
 from ceo.message.all_done_message import AllDoneMessage
+from ceo.message.before_action_taken_message import BeforeActionTakenMessage
 from ceo.message.after_action_taken_message import AfterActionTakenMessage
 from ceo.prompt import (
     NextMovePrompt,
@@ -98,7 +99,6 @@ class Agent(BaseAgent, MemoryAugment):
                 __after_action_taken_hook = _arg
             if isinstance(_arg, BeforeActionTaken):
                 __before_action_taken_hook = _arg
-        # todo __before_action_taken_hook implementation
         __start_time = time.perf_counter()
         if self.__expected_step < 1:
             self.estimate_step()
@@ -119,8 +119,9 @@ class Agent(BaseAgent, MemoryAugment):
                     abilities=self._abilities,
                     history=self.memory
                 ).invoke(self._model)
-                if not isinstance(next_move, bool):
-                    action, args = next_move
+                if isinstance(next_move, BeforeActionTakenMessage):
+                    next_move = __before_action_taken_hook(self, next_move)
+                    action, args = next_move.ability, next_move.arguments
                     if action.name.startswith(AGENTIC_ABILITY_PREFIX):
                         args = {
                             'request': self._request,

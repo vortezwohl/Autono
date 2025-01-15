@@ -6,6 +6,7 @@ from langchain_core.language_models import BaseChatModel
 
 from ceo.ability import Ability
 from ceo.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
+from ceo.message.before_action_taken_message import BeforeActionTakenMessage
 from ceo.prompt.prompt import Prompt
 from ceo.exception.too_dumb_exception import TooDumbException
 
@@ -162,7 +163,7 @@ class NextMovePrompt(Prompt):
         log.debug(f'NextMovePrompt: {self.prompt}')
 
     # noinspection PyUnusedLocal,DuplicatedCode
-    def invoke(self, model: BaseChatModel, max_retry: int = 6) -> tuple[Ability, dict] | bool:
+    def invoke(self, model: BaseChatModel, max_retry: int = 6) -> BeforeActionTakenMessage | bool:
         result: str = str()
         count: int = 0
         exclamation = '!'
@@ -231,5 +232,5 @@ class NextMovePrompt(Prompt):
             return True
         for ability in self.abilities:
             if ability.name == ability_name:
-                return ability, args
+                return BeforeActionTakenMessage(ability=ability, arguments=args)
         return False
