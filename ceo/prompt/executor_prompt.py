@@ -7,10 +7,13 @@ from langchain_core.language_models import BaseChatModel
 
 from ceo.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
 from ceo.ability.ability import Ability
+from ceo.message.after_execution_message import AfterExecutionMessage
 from ceo.exception.too_dumb_exception import TooDumbException
 from ceo.prompt.prompt import Prompt
 
 log = logging.getLogger('ceo.prompt')
+
+AFTER_EXECUTION_MESSAGE_KEYS = ('summarization', 'ability', 'choice', 'returns')
 
 
 class ExecutorPrompt(Prompt):
@@ -39,7 +42,7 @@ class ExecutorPrompt(Prompt):
         log.debug(f'ExecutorResponse (before): {resp}')
         return resp
 
-    def invoke(self, model: BaseChatModel, max_retry: int = 3) -> dict:
+    def invoke(self, model: BaseChatModel, max_retry: int = 3) -> AfterExecutionMessage:
         result = self.action.__call__(**self.args)
         tmp_args = copy.deepcopy(self.args)
         if self.action.name.startswith(AGENTIC_ABILITY_PREFIX):
@@ -55,7 +58,7 @@ class ExecutorPrompt(Prompt):
             "result": str(result),
             "output_format": {
                 'ability': '{ability_just_used}',
-                'choice': '{choice_just_made}',
+                'choice': '{choice_just_made (args_in_jsonl_format)}',
                 'returns': '{result_just_received}',
                 'summarization': '{summarization}'
             },
@@ -67,8 +70,10 @@ class ExecutorPrompt(Prompt):
                 'summarization': "I used the wechat_sender ability to wrote a wechat message which says 'Bonjour', "
                                  "the result shows 'success' which indicates success of wechat message sending."
             }, ensure_ascii=False),
-            "hint_for_output": 'You must strictly follow the json format in <output_format>!! '
-                               'You can refer to example in <output_example>!!'
+            "limitation_1_for_output": 'The <choice> field in your output should be formatted in a single jsonl.',
+            "limitation_2_for_output": f'Your output is a json which must contain these keys: {list(AFTER_EXECUTION_MESSAGE_KEYS)}',
+            "limitation_3_for_output": 'You must strictly follow the json format in <output_format>!! '
+                                       'You can refer to example in <output_example>!!'
         }, ensure_ascii=False)
         if len(self.ext_context) > 0:
             prompt = Prompt.construct_prompt(prompt, self.ext_context)
@@ -76,7 +81,6 @@ class ExecutorPrompt(Prompt):
         count = 0
         exclamation = '!'
         tmp_prompt = prompt
-        keys = ('summarization', 'ability', 'choice', 'returns')
         while True:
             # noinspection DuplicatedCode
             if count > 0:
@@ -91,7 +95,11 @@ class ExecutorPrompt(Prompt):
             try:
                 correct_format = True
                 res_dict: dict = json.loads(res[res.find('{'):res.rfind('}') + 1].strip())
-                for _key in keys:
+                try:
+                    res_dict['choice'] = json.loads(res_dict.get('choice', str()))
+                except json.decoder.JSONDecodeError:
+                    pass
+                for _key in AFTER_EXECUTION_MESSAGE_KEYS:
                     if _key not in res_dict.keys():
                         correct_format = False
                 if correct_format:
@@ -105,4 +113,9 @@ class ExecutorPrompt(Prompt):
                               f'You must strictly follow the json format in <output_format>{count * 2 * exclamation} '
                               f'You should refer to example in <output_example>{count * 2 * exclamation}')
                 tmp_prompt = Prompt.construct_prompt(tmp_prompt, '')
-        return res_dict
+        return AfterExecutionMessage(
+            ability=res_dict.get('ability'),
+            choice=res_dict.get('choice'),
+            returns=res_dict.get('returns'),
+            summarization=res_dict.get('summarization')
+        )
