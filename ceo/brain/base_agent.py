@@ -22,6 +22,7 @@ from ceo.prompt import (
 )
 
 log = logging.getLogger('ceo')
+SYSTEM_ABILITY_PREFIX = '__SystemAbility__'
 
 
 class BaseAgent:
@@ -79,6 +80,7 @@ class BaseAgent:
         }
 
     def introduce(self, update: bool = True) -> str:
+        # noinspection PyUnusedLocal
         def get_your_info(*args, **kwargs) -> dict:
             """
             What does this ability do: To get your personal information.
@@ -93,7 +95,7 @@ class BaseAgent:
                 'info': _info_dict
             }
 
-        get_your_info.__name__ = f'__SystemAbility__{get_your_info.__name__}'
+        get_your_info.__name__ = f'{SYSTEM_ABILITY_PREFIX}{get_your_info.__name__}'
         self.grant_ability(get_your_info, update_introduction=False)
         if update:
             self._introduction = SelfIntroducePrompt(agent=self).invoke(self._model)
@@ -135,7 +137,7 @@ class BaseAgent:
             both_agentic = (_ability.name.startswith(AGENTIC_ABILITY_PREFIX)
                             and ability.name.startswith(AGENTIC_ABILITY_PREFIX))
             both_not_agentic = (not _ability.name.startswith(AGENTIC_ABILITY_PREFIX)
-                            and not ability.name.startswith(AGENTIC_ABILITY_PREFIX))
+                                and not ability.name.startswith(AGENTIC_ABILITY_PREFIX))
             if both_agentic:
                 if _ability.name == ability.name:
                     self._abilities.remove(_ability)
