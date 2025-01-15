@@ -5,6 +5,7 @@ from collections import OrderedDict
 from typing_extensions import override
 
 from ceo.ability import Ability
+from ceo.brain.hook.after_execution_hook import AfterExecutionHook
 from ceo.brain.memory_augment import MemoryAugment
 
 PREFIX = '__AgenticAbility__'
@@ -63,13 +64,7 @@ class AgenticAbility(Ability):
 
     @override
     def __call__(self, request: str, request_by_step: str, memory: OrderedDict, *args, **kwargs) -> str:
+        after_execution_hook = kwargs.get('after_execution_hook', AfterExecutionHook.do_nothing())
         self._agent.relay(request_by_step=request_by_step, request=request)
         self._agent.bring_in_memory(memory)
-        result = self._agent.just_do_it()
-        if isinstance(result, dict):
-            if 'conclusion' in result.keys():
-                del result['conclusion']
-            if 'misc' in result.keys():
-                del result['misc']
-            return json.dumps(result, ensure_ascii=False)
-        return result
+        return self._agent.just_do_it(after_execution_hook=after_execution_hook).response_for_agent

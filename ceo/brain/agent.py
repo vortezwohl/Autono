@@ -15,6 +15,7 @@ from ceo.brain.base_agent import BaseAgent
 from ceo.brain.hook.after_execution_hook import AfterExecutionHook
 from ceo.brain.memory_augment import MemoryAugment
 from ceo.enum.Personality import Personality
+from ceo.message.all_done_message import AllDoneMessage
 from ceo.message.after_execution_message import AfterExecutionMessage
 from ceo.prompt import (
     NextMovePrompt,
@@ -87,7 +88,7 @@ class Agent(BaseAgent, MemoryAugment):
         return self.reposition()
 
     @override
-    def just_do_it(self, after_execution_hook: AfterExecutionHook = AfterExecutionHook.do_nothing()) -> dict:
+    def just_do_it(self, after_execution_hook: AfterExecutionHook = AfterExecutionHook.do_nothing()) -> AllDoneMessage:
         __start_time = time.perf_counter()
         if self.__expected_step < 1:
             self.estimate_step()
@@ -114,13 +115,11 @@ class Agent(BaseAgent, MemoryAugment):
                         args = {
                             'request': self._request,
                             'request_by_step': self._request_by_step,
-                            'memory': self.memory
+                            'memory': self.memory,
+                            'after_execution_hook': after_execution_hook
                         }
-                    self.memorize(
-                        after_execution_hook(
-                            ExecutorPrompt(args=args, action=action).invoke(model=self._model)
-                        )
-                    )
+                    __after_execution_msg = ExecutorPrompt(args=args, action=action).invoke(model=self._model)
+                    self.memorize(after_execution_hook(self, __after_execution_msg))
                     self._act_count += 1
                     continue
             brief_conclusion, response = IntrospectionPrompt(
@@ -133,15 +132,13 @@ class Agent(BaseAgent, MemoryAugment):
             self.reposition()
             log.debug(f'Agent: {self._name}; Conclusion: {brief_conclusion};')
             log.debug(f'Agent: {self._name}; Step count: {__step_count}; Time used: {__time_used} seconds;')
-            return {
-                "success": next_move,
-                "conclusion": brief_conclusion,
-                "raw_response": response,
-                'misc': {
-                    'time_used': __time_used,
-                    'step_count': __step_count
-                }
-            }
+            return AllDoneMessage(
+                success=next_move,
+                conclusion=brief_conclusion,
+                raw_response=response,
+                time_used=__time_used,
+                step_count=__step_count
+            )
 
     def assign_with_memory(self, request: str, memory: OrderedDict):
         return self.assign(request).bring_in_memory(memory)
