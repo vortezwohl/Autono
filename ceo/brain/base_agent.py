@@ -1,25 +1,24 @@
+import abc
 import hashlib
 import inspect
 import json
 import logging
 import random
 import time
-import warnings
 from typing import Callable
 
 from langchain_core.language_models import BaseChatModel
 
 from ceo.ability.agentic_ability import Ability, PREFIX as AGENTIC_ABILITY_PREFIX
+from ceo.message.all_done_message import AllDoneMessage
 from ceo.prompt import (
     SchedulerPrompt,
-    AnalyserPrompt,
-    ExecutorPrompt,
-    IntrospectionPrompt,
     RequestResolverPrompt,
     SelfIntroducePrompt
 )
 
 log = logging.getLogger('ceo')
+SYSTEM_ABILITY_PREFIX = '__SystemAbility__'
 
 
 class BaseAgent:
@@ -77,6 +76,7 @@ class BaseAgent:
         }
 
     def introduce(self, update: bool = True) -> str:
+        # noinspection PyUnusedLocal
         def get_your_info(*args, **kwargs) -> dict:
             """
             What does this ability do: To get your personal information.
@@ -91,7 +91,7 @@ class BaseAgent:
                 'info': _info_dict
             }
 
-        get_your_info.__name__ = f'__SystemAbility__{get_your_info.__name__}'
+        get_your_info.__name__ = f'{SYSTEM_ABILITY_PREFIX}{get_your_info.__name__}'
         self.grant_ability(get_your_info, update_introduction=False)
         if update:
             self._introduction = SelfIntroducePrompt(agent=self).invoke(self._model)
@@ -133,7 +133,7 @@ class BaseAgent:
             both_agentic = (_ability.name.startswith(AGENTIC_ABILITY_PREFIX)
                             and ability.name.startswith(AGENTIC_ABILITY_PREFIX))
             both_not_agentic = (not _ability.name.startswith(AGENTIC_ABILITY_PREFIX)
-                            and not ability.name.startswith(AGENTIC_ABILITY_PREFIX))
+                                and not ability.name.startswith(AGENTIC_ABILITY_PREFIX))
             if both_agentic:
                 if _ability.name == ability.name:
                     self._abilities.remove(_ability)
@@ -176,43 +176,5 @@ class BaseAgent:
         self._request_by_step = request_by_step
         return self.reposition()
 
-    def __step_quiet(self) -> str:
-        if self._act_count < len(self.__schedule):
-            combined_request = {
-                'raw_request': self._request,
-                'request_by_step': self._request_by_step
-            }
-            analysing = AnalyserPrompt(
-                request=combined_request,
-                prev_results=self.__prev_results,
-                action=self.__schedule[self._act_count]
-            )
-            action, args = analysing.invoke(self._model)
-            executing = ExecutorPrompt(args=args, action=action)
-            action_str = (f'Agent: {self._name}; Action {self._act_count + 1}/{len(self.__schedule)}: '
-                          f'{json.dumps(executing.invoke(model=self._model), ensure_ascii=False)};')
-            self.__prev_results.append(action_str)
-            self._act_count += 1
-            log.debug(action_str)
-            return action_str
-        self.reposition()
-        return ''
-
-    def just_do_it(self) -> str | None:
-        warnings.warn(
-            "This function is deprecated and will be removed in future versions.",
-            DeprecationWarning,
-            stacklevel=2
-        )
-        if not self.plan():
-            return None
-        for act_count in range(len(self.__schedule)):
-            self.__step_quiet()
-        brief_conclusion, response = IntrospectionPrompt(
-            request=self._request,
-            history=self.__prev_results,
-            self_info=self.introduction
-        ).invoke(self._model)
-        log.debug(f'Agent: {self._name}; Conclusion: {brief_conclusion};')
-        self.reposition()
-        return f'{self._name}: {response}'
+    @abc.abstractmethod
+    def just_do_it(self, *args, **kwargs) -> AllDoneMessage: ...

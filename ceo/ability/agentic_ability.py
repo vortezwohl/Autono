@@ -9,6 +9,7 @@ from ceo.brain.memory_augment import MemoryAugment
 
 PREFIX = '__AgenticAbility__'
 
+from ceo.brain.hook.after_action_taken import BaseHook
 from ceo.brain.base_agent import BaseAgent
 
 log = logging.getLogger('ceo.ability')
@@ -63,13 +64,12 @@ class AgenticAbility(Ability):
 
     @override
     def __call__(self, request: str, request_by_step: str, memory: OrderedDict, *args, **kwargs) -> str:
+        before_action_taken_hook = kwargs.get('before_action_taken_hook', None)
+        after_action_taken_hook = kwargs.get('after_action_taken_hook', None)
+        if before_action_taken_hook is None:
+            before_action_taken_hook = BaseHook.do_nothing()
+        if after_action_taken_hook is None:
+            after_action_taken_hook = BaseHook.do_nothing()
         self._agent.relay(request_by_step=request_by_step, request=request)
         self._agent.bring_in_memory(memory)
-        result = self._agent.just_do_it()
-        if isinstance(result, dict):
-            if 'conclusion' in result.keys():
-                del result['conclusion']
-            if 'misc' in result.keys():
-                del result['misc']
-            return json.dumps(result, ensure_ascii=False)
-        return result
+        return self._agent.just_do_it(before_action_taken_hook, after_action_taken_hook).response_for_agent
