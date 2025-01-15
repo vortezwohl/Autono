@@ -117,7 +117,7 @@ class ExecutorPrompt(Prompt):
                 tmp_prompt = Prompt.construct_prompt(tmp_prompt, '')
         return AfterActionTakenMessage(
             ability=res_dict.get('ability'),
-            choice=res_dict.get('choice'),
+            arguments=res_dict.get('choice'),
             returns=res_dict.get('returns'),
             summarization=res_dict.get('summarization')
         )

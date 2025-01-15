@@ -8,7 +8,7 @@ from ceo.message.base_massage import BaseMessage
 @dataclass
 class AfterActionTakenMessage(BaseMessage):
     ability: str
-    choice: str | dict
+    arguments: str | dict
     returns: str
     summarization: str
 
@@ -16,7 +16,7 @@ class AfterActionTakenMessage(BaseMessage):
     def to_dict(self):
         return {
             'ability': self.ability,
-            'choice': self.choice,
+            'choice': self.arguments,
             'returns': self.returns,
             'summarization': self.summarization,
         }
