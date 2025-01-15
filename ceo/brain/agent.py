@@ -12,6 +12,7 @@ from langchain_core.language_models import BaseChatModel
 
 from ceo.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
 from ceo.brain.base_agent import BaseAgent
+from ceo.brain.hook.next_move_hook import NextMoveHook
 from ceo.brain.hook.after_execution_hook import AfterExecutionHook
 from ceo.brain.hook.base_hook import BaseHook
 from ceo.brain.memory_augment import MemoryAugment
@@ -91,9 +92,13 @@ class Agent(BaseAgent, MemoryAugment):
     @override
     def just_do_it(self, *args, **kwargs) -> AllDoneMessage:
         __after_execution_hook: AfterExecutionHook | Callable = BaseHook.do_nothing()
-        for _hook in args:
-            if isinstance(_hook, AfterExecutionHook):
-                __after_execution_hook = _hook
+        __next_move_hook: NextMoveHook | Callable = BaseHook.do_nothing()
+        for _arg in args:
+            if isinstance(_arg, AfterExecutionHook):
+                __after_execution_hook = _arg
+            if isinstance(_arg, NextMoveHook):
+                __next_move_hook = _arg
+        # todo next_move_hook implementation
         __start_time = time.perf_counter()
         if self.__expected_step < 1:
             self.estimate_step()
