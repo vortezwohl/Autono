@@ -1,3 +1,4 @@
+import abc
 import hashlib
 import inspect
 import json
@@ -10,11 +11,11 @@ from typing import Callable
 from langchain_core.language_models import BaseChatModel
 
 from ceo.ability.agentic_ability import Ability, PREFIX as AGENTIC_ABILITY_PREFIX
+from ceo.brain.hook.after_execution_hook import AfterExecutionHook
 from ceo.prompt import (
     SchedulerPrompt,
     AnalyserPrompt,
     ExecutorPrompt,
-    IntrospectionPrompt,
     RequestResolverPrompt,
     SelfIntroducePrompt
 )
@@ -177,6 +178,11 @@ class BaseAgent:
         return self.reposition()
 
     def __step_quiet(self) -> str:
+        warnings.warn(
+            "This function is deprecated and will be removed in future versions.",
+            DeprecationWarning,
+            stacklevel=2
+        )
         if self._act_count < len(self.__schedule):
             combined_request = {
                 'raw_request': self._request,
@@ -198,21 +204,5 @@ class BaseAgent:
         self.reposition()
         return ''
 
-    def just_do_it(self) -> str | None:
-        warnings.warn(
-            "This function is deprecated and will be removed in future versions.",
-            DeprecationWarning,
-            stacklevel=2
-        )
-        if not self.plan():
-            return None
-        for act_count in range(len(self.__schedule)):
-            self.__step_quiet()
-        brief_conclusion, response = IntrospectionPrompt(
-            request=self._request,
-            history=self.__prev_results,
-            self_info=self.introduction
-        ).invoke(self._model)
-        log.debug(f'Agent: {self._name}; Conclusion: {brief_conclusion};')
-        self.reposition()
-        return f'{self._name}: {response}'
+    @abc.abstractmethod
+    def just_do_it(self, after_execution_hook: AfterExecutionHook) -> str | None: ...
