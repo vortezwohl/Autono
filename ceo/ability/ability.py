@@ -40,7 +40,10 @@ class Ability:
 
             def __func(loop: asyncio.AbstractEventLoop):
                 nonlocal __res, args, kwargs
-                __res = loop.run_until_complete(self._function(*args, **kwargs))
+                try:
+                    __res = loop.run_until_complete(self._function(*args, **kwargs))
+                finally:
+                    loop.close()
 
             __thread = threading.Thread(
                 target=__func,

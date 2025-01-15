@@ -3,7 +3,7 @@
         <img src="https://github.com/vortezwohl/CEO/releases/download/icon/ceo-icon-inv.png" alt="CEO" height="105">
     </p>
     <p style="font-weight: 200; font-size: 19px">
-        一個基於 <a href="https://arxiv.org/abs/2210.03629">ReAct</a> 範式的超輕量智能體框架，支援主流的 LLMs，比 <a href="https://github.com/openai/swarm">Swarm</a> 更强.
+        一個基於 <a href="https://arxiv.org/abs/2210.03629">ReAct</a> 範式的超輕量智能體框架.
     </p>
 </div>
 
@@ -152,7 +152,7 @@ date = {2024-10-25}
     print(response)
     ```
 
-> `ceo` 也支援多智能體協作場景，可用 `@agentic(agent: Agent)`, 宣告一個函數為智能體呼叫能力，然後賦予給一個智能體。[查看示例](#multi-agent)。
+> `ceo` 也支援多智能體協作場景，可用 `@agentic(agent: Agent)`, 宣告一個函數為智能體呼叫能力，然後賦予給一個智能體。[查看示例](#多智能體協作)。
 
 
 ## 範例

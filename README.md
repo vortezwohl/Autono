@@ -3,7 +3,7 @@
         <img src="https://github.com/vortezwohl/CEO/releases/download/icon/ceo-icon-inv.png" alt="CEO" height="105">
     </p>
     <p style="font-weight: 200; font-size: 19px">
-        An ultra-lightweight agentic AI framework based on the <a href="https://arxiv.org/abs/2210.03629">ReAct</a> paradigm, supporting mainstream LLMs and is stronger than <a href="https://github.com/openai/swarm">Swarm</a>.
+        An ultra-lightweight agentic AI framework based on the <a href="https://arxiv.org/abs/2210.03629">ReAct</a> paradigm.
     </p>
 </div>
 
