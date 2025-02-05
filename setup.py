@@ -8,7 +8,7 @@ with open("LICENSE", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="ceo-py",
-    version='0.12.0-preview',
+    version='0.12.2-preview',
     author="vortezwohl",
     author_email="vortez.wohl@gmail.com",
     description="An ultra-lightweight agentic AI framework based on the ReAct paradigm.",
