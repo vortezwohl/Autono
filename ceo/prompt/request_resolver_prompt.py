@@ -23,7 +23,7 @@ class RequestResolverPrompt(Prompt):
             "output_format": {
                 "step_{n}": "({condition_for_step_{n}}) {action_of_step_{n}}"
             },
-            "hint_1_for_output": "Break user's intention(s) down into multiple minimum steps as granular as possible. "
+            "hint_1_for_output": "Break user's intention(s) down into possible steps. "
                                  "Keep track of the steps' interdependence and orderliness.",
             "hint_2_for_output": 'You must strictly follow the format in <output_format>! '
                                  'You can refer to example in <output_example>!',
