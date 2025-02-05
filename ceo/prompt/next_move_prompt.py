@@ -16,6 +16,7 @@ SEPARATOR = '--SEP--'
 END = '--END--'
 MISSION_COMPLETE = '-mission-complete-'
 MISSION_FAILED = '-mission-failed-'
+MAKE_FINAL_RESPONSE = '-make-final-response-'
 
 OUTPUT_EXAMPLE = """
 [step1] In the provided history, events related to the user's request are listed chronologically:
@@ -40,19 +41,26 @@ class NextMovePrompt(Prompt):
                  history: OrderedDict | None = None,
                  ext_context: str = ''):
         self.abilities = abilities
-        self.__ability_names = [MISSION_COMPLETE, MISSION_FAILED]
+        self.__ability_names = [MISSION_COMPLETE, MISSION_FAILED, MAKE_FINAL_RESPONSE]
         for ability in self.abilities:
             self.__ability_names.append(ability.name)
         abilities_dict: dict = {
             MISSION_COMPLETE: {
                 'ability_name': MISSION_COMPLETE,
-                'description': 'To be chosen only when mission is completed.',
+                'description': 'To be chosen only when mission is considered completed.',
                 'parameters_required': '/',
                 'returns': '/'
             },
             MISSION_FAILED: {
                 'ability_name': MISSION_FAILED,
-                'description': 'To be chosen only when mission is failed.',
+                'description': 'To be chosen only when mission is considered failed.',
+                'parameters_required': '/',
+                'returns': '/'
+            },
+            MAKE_FINAL_RESPONSE: {
+                'ability_name': MAKE_FINAL_RESPONSE,
+                'description': 'After ALL previous actions performed SUCCESSFULLY, '
+                               'you can make the final response to user.',
                 'parameters_required': '/',
                 'returns': '/'
             }
@@ -203,7 +211,8 @@ class NextMovePrompt(Prompt):
                     continue
                 if (ability_name.startswith(AGENTIC_ABILITY_PREFIX)
                         or MISSION_COMPLETE in ability_name
-                        or MISSION_FAILED in ability_name):
+                        or MISSION_FAILED in ability_name
+                        or MAKE_FINAL_RESPONSE in ability_name):
                     break
                 _ability = None
                 _wrong_param = False
@@ -228,7 +237,7 @@ class NextMovePrompt(Prompt):
                           f'You must strictly follow the format in <output_format>{count * 2 * exclamation} '
                           f'You should refer to example in <output_example>{count * 2 * exclamation}')
             tmp_prompt = Prompt.construct_prompt(tmp_prompt, '')
-        if ability_name.__contains__(MISSION_COMPLETE):
+        if ability_name.__contains__(MISSION_COMPLETE) or ability_name.__contains__(MAKE_FINAL_RESPONSE):
             return True
         for ability in self.abilities:
             if ability.name == ability_name:
