@@ -142,9 +142,9 @@ class NextMovePrompt(Prompt):
             "limitation_for_args_output_format": f'The "{SEPARATOR}" pattern should be after '
                                                  f'all the thought processes and before the <args and ability>.'
                                                  f'The <args> should be after the "{SEPARATOR}" pattern.'
-                                                 'The <args> should be formatted as json.'
+                                                 'The <args> should be well formatted in JSON!!'
                                                  'In <args> you only gives the arguments for the chosen one ability.'
-                                                 'The ability should be after <args>.',
+                                                 'The <ability> should be after <args>.',
             "hint_for_separation_pattern": f'The "{SEPARATOR}" pattern which separates <thought processes> and '
                                            '<args and ability> is absolutely important, do not forget to place it.',
             "hint_for_end_pattern": f'The "{END}" pattern marks the end of your whole response, '
