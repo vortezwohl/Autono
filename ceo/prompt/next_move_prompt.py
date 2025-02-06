@@ -48,21 +48,21 @@ class NextMovePrompt(Prompt):
             MISSION_COMPLETE: {
                 'ability_name': MISSION_COMPLETE,
                 'description': 'To be chosen only when mission is considered completed.',
-                'parameters_required': '/',
-                'returns': '/'
+                'parameters_required': [],
+                'returns': None
             },
             MISSION_FAILED: {
                 'ability_name': MISSION_FAILED,
                 'description': 'To be chosen only when mission is considered failed.',
-                'parameters_required': '/',
-                'returns': '/'
+                'parameters_required': [],
+                'returns': None
             },
             MAKE_FINAL_RESPONSE: {
                 'ability_name': MAKE_FINAL_RESPONSE,
                 'description': 'After ALL previous actions performed SUCCESSFULLY, '
                                'you can make the final response to user.',
-                'parameters_required': '/',
-                'returns': '/'
+                'parameters_required': [],
+                'returns': None
             }
         }
         # noinspection PyUnusedLocal
@@ -116,13 +116,13 @@ class NextMovePrompt(Prompt):
                     "condition": "If the <user_request> has not been fully properly accomplished and "
                                  "there is no ability in your <abilities> "
                                  "that can further advance the accomplishment of the <user_request>",
-                    "action": f'Provide a special ability called "{MISSION_FAILED}" (which is not a real ability) '
+                    "action": f'Provide the special ability called "{MISSION_FAILED}" '
                               'with "args:{}".'
                 }, {
                     "step": 6,
                     "condition": "If the <user_request> has been fully and properly accomplished "
                                  "according to <history> and <user_request>",
-                    "action": f'Provide a special ability called "{MISSION_COMPLETE}" (which is not a real ability) '
+                    "action": f'Provide the special ability called "{MISSION_COMPLETE}" '
                               'with "args:{}".'
                 }
             ],
