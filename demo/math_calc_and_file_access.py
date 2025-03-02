@@ -10,6 +10,9 @@ from sympy import simplify
 from dotenv import load_dotenv
 
 load_dotenv()
+import logging
+
+logging.getLogger('ceo.prompt').setLevel(logging.DEBUG)
 
 
 @ability

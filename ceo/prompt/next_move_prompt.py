@@ -10,6 +10,8 @@ from ceo.message.before_action_taken_message import BeforeActionTakenMessage
 from ceo.prompt.prompt import Prompt
 from ceo.exception.too_dumb_exception import TooDumbException
 
+from data import next_move_dataset
+
 log = logging.getLogger('ceo.prompt')
 
 SEPARATOR = '--SEP--'
@@ -186,6 +188,16 @@ class NextMovePrompt(Prompt):
                     raise TooDumbException(model)
             count += 1
             result = model.invoke(tmp_prompt).content
+
+            # todo dataset collection
+            alpaca_entry = {
+                'instruction': tmp_prompt,
+                'input': '',
+                'output': result,
+                'system': ''
+            }
+            next_move_dataset.append(alpaca_entry)
+
             log.debug(f"Next move thought process: \n{result}")
             _accurate_action_str = result[result.rfind(SEPARATOR) + len(SEPARATOR):result.rfind(END)]
             if (result.count(SEPARATOR) == 1

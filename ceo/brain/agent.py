@@ -26,6 +26,8 @@ from ceo.prompt import (
     IntrospectionPrompt
 )
 
+from data import next_move_dataset, save_to_jsonl, save_to_json_list
+
 PRUDENT_P = 0.25
 PRUDENT_BETA = 1.45
 INQUISITIVE_P = 0.05
@@ -134,6 +136,7 @@ class Agent(BaseAgent, MemoryAugment):
                     self.memorize(__after_action_taken_hook(self, __after_execution_msg))
                     self._act_count += 1
                     continue
+            save_to_jsonl(next_move_dataset, '../data/next_move_dataset.jsonl')
             brief_conclusion, response = IntrospectionPrompt(
                 request=self._request,
                 history=self.memory,
