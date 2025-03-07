@@ -178,6 +178,14 @@ class NextMovePrompt(Prompt):
         count: int = 0
         exclamation = '!'
         tmp_prompt = self.prompt
+        _dict_tmp_prompt = json.loads(tmp_prompt)['prompt']
+        del _dict_tmp_prompt['limitation_for_ability_output_format']
+        del _dict_tmp_prompt['hint_for_output']
+        del _dict_tmp_prompt['output_example']
+        del _dict_tmp_prompt['hint_for_end_pattern']
+        del _dict_tmp_prompt['hint_for_separation_pattern']
+        del _dict_tmp_prompt['limitation_for_args_output_format']
+        del _dict_tmp_prompt['limitation_for_thought_process_output']
         while True:
             # noinspection DuplicatedCode
             if count > 0:
@@ -191,7 +199,7 @@ class NextMovePrompt(Prompt):
 
             # todo dataset collection
             alpaca_entry = {
-                'instruction': tmp_prompt,
+                'instruction': json.dumps(_dict_tmp_prompt),
                 'input': '',
                 'output': result,
                 'system': ''
