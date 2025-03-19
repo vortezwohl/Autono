@@ -110,7 +110,7 @@ class NextMovePrompt(Prompt):
                                      "(only one single ability can be chosen)",
                     "third_action": "After you have chosen the ability as next move, "
                                     "generate arguments for the ability(function) to achieve <next move>, "
-                                    "before you generate arguments, explain why you give these arguments briefly.",
+                                    "before you generate arguments, explain why you give these arguments briefly."
                 }, {
                     "step": 5,
                     "condition": "If the <user_request> has not been fully properly accomplished and "
