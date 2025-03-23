@@ -24,7 +24,7 @@ This study proposes a lightweight autonomous agent framework based on the ReAct 
 
 ## Experiments
 
-The experimental results demonstrate that the `ceo-py` framework significantly outperforms autogen and langchain in handling tasks of varying complexity, especially in multi-step tasks with possible failures.
+The experimental results demonstrate that the `ceo-py` framework significantly outperforms `autogen` and `langchain` in handling tasks of varying complexity, especially in multi-step tasks with possible failures.
 
 | Framework   | Version | Model                                      | one-step-task | multi-step-task | multi-step-task-with-possible-failure |
 | ------ | --- |----------------------------------------- | ------------- | --------------- | ---------------------------------------- |
