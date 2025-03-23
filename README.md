@@ -20,25 +20,23 @@
 
 ## Abstract
 
-This study proposes a lightweight autonomous agent framework based on the ReAct paradigm, designed to solve complex tasks through adaptive decision-making and multi-agent collaboration. Unlike traditional frameworks that generate fixed workflows in advance, this framework dynamically decides the next action during execution based solely on the current state. To address the issue of inappropriate termination that may result from adaptive execution paths, a novel abandonment strategy based on a probabilistic penalty mechanism is introduced. Additionally, to enable multi-agent collaboration, a memory-passing mechanism is introduced, allowing agents to share and dynamically update memories.
+This study proposes a lightweight autonomous agent framework based on the ReAct paradigm, designed to solve complex tasks through adaptive decision-making and multi-agent collaboration. Unlike traditional frameworks that generate fixed workflows in advance, this framework dynamically decides the next move during execution based solely on the current state. To address the issue of inappropriate termination that may result from adaptive execution paths, a novel abandonment strategy based on a probabilistic penalty mechanism is introduced. Additionally, to enable multi-agent collaboration, a memory-passing mechanism is introduced, allowing agents to share and dynamically update memories. The framework decomposes complex tasks into sub-tasks and plans their execution order and required capabilities according to the agents' abilities, enhancing task execution efficiency and relevance. The innovative abandonment algorithm dynamically adjusts the agent's task abandonment probability via a probabilistic penalty mechanism. By tuning the algorithm's hyperparameters, the agent's execution strategy can be balanced between conservative and exploratory tendencies, significantly improving adaptability and efficiency in complex environments. Moreover, the framework's modular design and tool-learning technology support flexible extensibility and ease of use, enabling customization and optimization based on actual needs. Agents can enhance their functionality using external tools and improve tool usage effectiveness through continuous learning and optimization. The multi-agent collaboration mechanism, with clear division and cooperation, allows each agent to focus on specific task parts, significantly boosting execution efficiency and quality.
 
-The framework decomposes complex tasks into sub-tasks and plans their execution order and required capabilities according to the agents' abilities, enhancing task execution efficiency and relevance. The innovative abandonment algorithm dynamically adjusts the agent's task abandonment probability via a probabilistic penalty mechanism. By tuning the algorithm's hyperparameters, the agent's execution strategy can be balanced between conservative and exploratory tendencies, significantly improving adaptability and efficiency in complex environments.
+## Experiments
 
-## Installation
+The experimental results demonstrate that the `ceo-py` framework significantly outperforms autogen and langchain in handling tasks of varying complexity, especially in multi-step tasks with possible failures.
 
-- From [PYPI](https://pypi.org/project/ceo-py/)
+| Framework   | Version | Model                                      | one-step-task | multi-step-task | multi-step-task-with-possible-failure |
+| ------ | --- |----------------------------------------- | ------------- | --------------- | ---------------------------------------- |
+| `ceo-py` | `0.12.3rc0` |gpt-4o-mini<br>qwen-plus<br>deepseek-v3 | 96.7%</br>100%</br>100% | 100%</br>96.7%</br>100% | 76.7%</br>93.3%</br>93.3% |
+| `autogen` | `0.4.9.2` |gpt-4o-mini<br>qwen-plus<br>deepseek-v3 |90%</br>90%</br>Not Supported | 53.3%</br>0%</br>Not Supported | 3.3%</br>3.3%</br>Not Supported |
+| `langchain` | `0.3.21` |gpt-4o-mini<br>qwen-plus<br>deepseek-v3 | 73.3%</br>73.3%</br>76.7% | 13.3%</br>13.3%</br>13.3% | 10%</br>13.3%</br>6.7% |
 
-    ```shell
-    pip install ceo-py
-    ```
+- `one-step-task`: Tasks that can be completed with a single tool call.
+- `multi-step-task`: Tasks that require multiple tool calls to complete, with no possibility of tool failure.
+- `multi-step-task-with-possible-failure`: Tasks that require multiple tool calls to complete, where tools may fail, requiring the agent to retry and correct errors.
 
-- From [Github](https://github.com/vortezwohl/CEO/releases)
-
-    Download .whl first then run
-
-    ```shell
-    pip install ./ceo_py-x.x.x-py3-none-any.whl
-    ```
+> You can reproduce my experiments [here](https://github.com/vortezwohl/ceo-experiment).
 
 ## Citation
 
@@ -60,6 +58,22 @@ year = {2024},
 date = {2024-10-25}
 }
 ```
+
+## Installation
+
+- From [PYPI](https://pypi.org/project/ceo-py/)
+
+    ```shell
+    pip install ceo-py
+    ```
+
+- From [Github](https://github.com/vortezwohl/CEO/releases)
+
+    Download .whl first then run
+
+    ```shell
+    pip install ./ceo_py-x.x.x-py3-none-any.whl
+    ```
 
 ## Quick Start
 
