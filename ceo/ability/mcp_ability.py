@@ -1,6 +1,3 @@
-import asyncio
-import threading
-
 from mcp import ClientSession
 from mcp.types import Tool
 from typing_extensions import override
@@ -29,27 +26,12 @@ class McpAbility(BaseAbility):
             returns=DEFAULT_RETURNS
         )
 
-    async def call_mcp_tool(self, *args, **kwargs):
-        return await self._mcp_client_session.call_tool(name=self.name, arguments=kwargs)
-
     @override
-    def __call__(self, *args, **kwargs):
-        __res = None
-
-        def __func(loop: asyncio.AbstractEventLoop):
-            nonlocal __res, args, kwargs
-            try:
-                __res = loop.run_until_complete(self.call_mcp_tool(*args, **kwargs))
-            finally:
-                loop.close()
-
-        __thread = threading.Thread(
-            target=__func,
-            args=(asyncio.new_event_loop(),)
-        )
-        __thread.start()
-        __thread.join(timeout=None)
-        return __res
+    async def __call__(self, *args, **kwargs):
+        _res = await self.session.call_tool(name=self.name, arguments=kwargs)
+        _status = 'SUCCESSFUL' if not _res.isError else 'FAILED'
+        return (f'McpAbility(mcp_tool="{self.name}") was {_status}.\n'
+                f'Result: "{_res.content}"')
 
     @property
     def session(self):
