@@ -4,7 +4,7 @@ from typing_extensions import Callable
 
 
 class BaseAbility(Callable):
-    def __init__(self, name: str, description: str, parameters: dict, returns: any):
+    def __init__(self, name: str, description: str | dict, parameters: dict, returns: any):
         self._name = name
         self._description = description
         self._parameters = parameters
