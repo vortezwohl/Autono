@@ -1,10 +1,9 @@
-import asyncio
 import inspect
 import json
-import threading
 
 from typing_extensions import Callable, override
 
+from ceo.util.synchronized_call import synchronized_call
 from ceo.ability.base_ability import BaseAbility
 
 
@@ -35,24 +34,7 @@ class Ability(BaseAbility):
 
     @override
     def __call__(self, *args, **kwargs):
-        if inspect.iscoroutinefunction(self._function):
-            __res = None
-
-            def __func(loop: asyncio.AbstractEventLoop):
-                nonlocal __res, args, kwargs
-                try:
-                    __res = loop.run_until_complete(self._function(*args, **kwargs))
-                finally:
-                    loop.close()
-
-            __thread = threading.Thread(
-                target=__func,
-                args=(asyncio.new_event_loop(),)
-            )
-            __thread.start()
-            __thread.join(timeout=None)
-            return __res
-        return self._function(*args, **kwargs)
+        return synchronized_call(self.function, *args, **kwargs)
 
     @property
     def function(self) -> Callable:

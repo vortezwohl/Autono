@@ -7,7 +7,8 @@ from .brain.lm import (
 )
 from .brain.agent import Agent
 from .ability import Ability, AgenticAbility
-from .util import ability, agentic
+from .util.agentic import agentic
+from .util.ability import ability
 from .enum import Personality
 
 __AUTHOR__ = '吴子豪 / Vortez Wohl'
