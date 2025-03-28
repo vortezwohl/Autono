@@ -3,7 +3,7 @@ import inspect
 import json
 import threading
 
-from typing_extensions import Callable
+from typing_extensions import Callable, override
 from ceo.ability.base_ability import BaseAbility
 
 
@@ -32,12 +32,7 @@ class Ability(BaseAbility):
             returns=signature.return_annotation
         )
 
-    def __repr__(self):
-        return json.dumps(self.to_dict(), ensure_ascii=False)
-
-    def __str__(self):
-        return self.__repr__()
-
+    @override
     def __call__(self, *args, **kwargs):
         if inspect.iscoroutinefunction(self._function):
             __res = None
@@ -57,19 +52,6 @@ class Ability(BaseAbility):
             __thread.join(timeout=None)
             return __res
         return self._function(*args, **kwargs)
-
-    def to_dict(self) -> dict:
-        param_list: list = list()
-        unnecessary_params: tuple = ('args', 'kwargs')
-        for name, _ in self._parameters.items():
-            if name not in unnecessary_params:
-                param_list.append(name)
-        return {
-            'ability_name': self._name,
-            'description': self._description,
-            'parameters_required': param_list,
-            'returns': str(self._returns)
-        }
 
     @property
     def function(self) -> Callable:
