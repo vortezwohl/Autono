@@ -6,9 +6,11 @@ from .brain.lm import (
     get_deepseek_model
 )
 from .brain.agent import Agent
-from .ability import Ability, AgenticAbility
+from .brain.stdio_mcp_agent import StdioMcpAgent
+from .ability import Ability, AgenticAbility, StdioMcpAbility
 from .util.agentic import agentic
 from .util.ability import ability
+from .util.synchronized_call import synchronized_call
 from .enum import Personality
 
 __AUTHOR__ = '吴子豪 / Vortez Wohl'
