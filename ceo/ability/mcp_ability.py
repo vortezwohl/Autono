@@ -21,11 +21,22 @@ class McpAbility(BaseAbility):
             {'name': k, 'type': 'str', 'description': v.get('description', NONE)}
             for k, v in _input_schema_dict['properties'].items()
         ]}, ensure_ascii=False)
+        _params_dict = dict()
+        for para in _input_schema_dict.get('required', list()):
+            _params_dict[para] = str()
+        super().__init__(
+            name=self.__name__,
+            description=self.__doc__,
+            parameters=_params_dict,
+            returns=f'A string feedback of {self.__name__}'
+        )
 
     @override
     def __call__(self, *args, **kwargs):
         ...
 
+    @override
+    def to_dict(self) -> dict: ...
 
 if __name__ == '__main__':
     tool = Tool(
