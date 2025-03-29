@@ -40,7 +40,7 @@ class Agent(BaseAgent, MemoryAugment):
                  request: str = '', memory: OrderedDict | None = None):
         BaseAgent.__init__(self, abilities=abilities, brain=brain, name=name, request=request)
         MemoryAugment.__init__(self, memory=memory)
-        self.__expected_step = 0
+        self._expected_step = 0
         if personality == Personality.PRUDENT:
             self._p = self.__base_p = PRUDENT_P
             self._beta = PRUDENT_BETA
@@ -71,7 +71,7 @@ class Agent(BaseAgent, MemoryAugment):
     def reposition(self):
         BaseAgent.reposition(self)
         self._memory = OrderedDict()
-        self.__expected_step = 0
+        self._expected_step = 0
         self._p = self.__base_p
         return self
 
@@ -100,12 +100,12 @@ class Agent(BaseAgent, MemoryAugment):
             if isinstance(_arg, BeforeActionTaken):
                 __before_action_taken_hook = _arg
         __start_time = time.perf_counter()
-        if self.__expected_step < 1:
+        if self._expected_step < 1:
             self.estimate_step()
-        log.debug(f'Agent: {self._name}; Expected steps: {self.__expected_step}; Request: "{self._request}";')
+        log.debug(f'Agent: {self._name}; Expected steps: {self._expected_step}; Request: "{self._request}";')
         stop = False
         while True:
-            if self._act_count > self.__expected_step:
+            if self._act_count > self._expected_step:
                 stop = self.stop()
                 self.penalize()
             next_move = False
@@ -157,13 +157,13 @@ class Agent(BaseAgent, MemoryAugment):
 
     def estimate_step(self):
         if self._request_by_step == '':
-            self.__expected_step = 0
+            self._expected_step = 0
             return
-        self.__expected_step = len(self.plan(_log=False))
+        self._expected_step = len(self.plan(_log=False))
         return self
 
     def set_expected_step(self, expected_step: int):
-        self.__expected_step = expected_step
+        self._expected_step = expected_step
         return self
 
     def memorize(self, action_taken: AfterActionTakenMessage):
