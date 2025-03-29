@@ -1,16 +1,24 @@
-from mcp import StdioServerParameters
-
 from ceo import (
-    StdioMcpAgent,
+    McpAgent,
     get_openai_model,
-    ability
+    ability,
+    sync_call,
+    StdioMcpConfig,
+    __BLOG__
 )
+from ceo.util.mcp_session import mcp_session
 from ceo.brain.hook import BeforeActionTaken, AfterActionTaken
 from ceo.message import BeforeActionTakenMessage, AfterActionTakenMessage
 from dotenv import load_dotenv
 
 load_dotenv()
 model = get_openai_model()
+stdio_mcp_config = StdioMcpConfig(
+    command='python',
+    args=['./playwright-plus-python-mcp.py'],
+    env=dict(),
+    cwd='./mcp_server'
+)
 
 
 @ability(model)
@@ -20,29 +28,31 @@ def write_file(filename: str, content: str) -> str:
     return f'{content} written to {filename}.'
 
 
-def before_action_taken(agent: StdioMcpAgent, message: BeforeActionTakenMessage):
+def before_action_taken(agent: McpAgent, message: BeforeActionTakenMessage):
     print(f'Agent: {agent.name}, Next move: {message.ability.name}')
     return message
 
 
-def after_action_taken(agent: StdioMcpAgent, message: AfterActionTakenMessage):
+def after_action_taken(agent: McpAgent, message: AfterActionTakenMessage):
     print(f'Agent: {agent.name}, Action taken: {message.summarization}')
     return message
 
 
-if __name__ == '__main__':
-    mcp_config = StdioServerParameters(
-        command='python',
-        args=['./playwright-plus-python-mcp.py'],
-        env=dict(),
-        cwd='./mcp_server'
-    )
-    mcp_agent = StdioMcpAgent(mcp_config=mcp_config, brain=model)
+@sync_call
+@mcp_session(stdio_mcp_config)
+async def run(session, request: str) -> str:
+    mcp_agent = await McpAgent(session=session, brain=model).fetch_abilities()
     mcp_agent.grant_ability(write_file)
-    output_file = 'result.txt'
-    request = f'Navigate to https://www.google.com. Then write down what you see here: {output_file}.'
-    result = mcp_agent.assign(request).just_do_it(
+    result = await mcp_agent.assign(request).just_do_it(
         BeforeActionTaken(before_action_taken),
         AfterActionTaken(after_action_taken)
     )
-    print(result.conclusion)
+    return result.conclusion
+
+
+if __name__ == '__main__':
+    output_file = 'result.txt'
+    request = (f'What is reinforcement learning? Bing (www.bing.com) it and write down the search results into local file: {output_file}. '
+               f'Then navigate to {__BLOG__}.')
+    ret = run(request)
+    print(ret)
