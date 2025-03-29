@@ -33,7 +33,8 @@ setuptools.setup(
         'langchain-community>=0.3.14',
         'langchain-openai>=0.2.3',
         'openai>=1.59.3',
-        'dashscope>=1.20.14'
+        'dashscope>=1.20.14',
+        'mcp>=1.6.0'
     ],
     entry_points={},
     include_package_data=False

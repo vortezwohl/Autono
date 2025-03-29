@@ -1,18 +1,26 @@
 import logging
 
+# noinspection PyUnresolvedReferences
+from .util.mcp_session import StdioMcpConfig
 from .brain.lm import (
     get_openai_model,
     get_dashscope_model,
     get_deepseek_model
 )
 from .brain.agent import Agent
-from .ability import Ability, AgenticAbility
-from .util import ability, agentic
+from .brain.mcp_agent import McpAgent
+from .ability import Ability, McpAbility, AgenticAbility
+from .util.agentic import agentic
+from .util.ability import ability
+from .util.synchronized_call import synchronized_call, sync_call
+from .util.mcp_session import mcp_session
 from .enum import Personality
 
 __AUTHOR__ = '吴子豪 / Vortez Wohl'
 __EMAIL__ = 'vortez.wohl@gmail.com'
 __VERSION__ = '0.12.3-preview'
+__GITHUB__ = 'https://github.com/vortezwohl'
+__BLOG__ = 'https://vortezwohl.github.io'
 
 logger = logging.getLogger('ceo')
 logger.setLevel(logging.ERROR)

@@ -10,6 +10,9 @@ from typing import Callable
 from langchain_core.language_models import BaseChatModel
 
 from ceo.ability.agentic_ability import Ability, PREFIX as AGENTIC_ABILITY_PREFIX
+from ceo.ability.base_ability import BaseAbility
+from ceo.ability.mcp_ability import McpAbility
+from ceo.message import AfterActionTakenMessage
 from ceo.message.all_done_message import AllDoneMessage
 from ceo.prompt import (
     SchedulerPrompt,
@@ -98,8 +101,9 @@ class BaseAgent:
         return self._introduction
 
     def grant_ability(self, ability: Callable | Ability, update_introduction: bool = True):
+        abilities_except_mcp = [_a for _a in self._abilities if not isinstance(_a, McpAbility)]
         if isinstance(ability, Ability):
-            for _ability in self._abilities:
+            for _ability in abilities_except_mcp:
                 both_agentic = (_ability.name.startswith(AGENTIC_ABILITY_PREFIX)
                                 and ability.name.startswith(AGENTIC_ABILITY_PREFIX))
                 both_not_agentic = (not _ability.name.startswith(AGENTIC_ABILITY_PREFIX)
@@ -112,7 +116,7 @@ class BaseAgent:
                         return
             self._abilities.append(ability)
         else:
-            for _ability in self._abilities:
+            for _ability in abilities_except_mcp:
                 if not _ability.name.startswith(AGENTIC_ABILITY_PREFIX):
                     if inspect.getsource(ability) == inspect.getsource(_ability.function):
                         return
@@ -126,10 +130,11 @@ class BaseAgent:
         self.introduce(update=(prev_size != len(self.abilities)))
 
     def deprive_ability(self, ability: Callable | Ability, update_introduction: bool = True):
+        abilities_except_mcp = [_a for _a in self._abilities if not isinstance(_a, McpAbility)]
         removed = False
         if not isinstance(ability, Ability):
             ability = Ability(ability)
-        for _ability in self._abilities:
+        for _ability in abilities_except_mcp:
             both_agentic = (_ability.name.startswith(AGENTIC_ABILITY_PREFIX)
                             and ability.name.startswith(AGENTIC_ABILITY_PREFIX))
             both_not_agentic = (not _ability.name.startswith(AGENTIC_ABILITY_PREFIX)
@@ -175,6 +180,9 @@ class BaseAgent:
         self._request = request
         self._request_by_step = request_by_step
         return self.reposition()
+
+    @abc.abstractmethod
+    def execute(self, args: dict, action: BaseAbility) -> AfterActionTakenMessage: ...
 
     @abc.abstractmethod
     def just_do_it(self, *args, **kwargs) -> AllDoneMessage: ...
