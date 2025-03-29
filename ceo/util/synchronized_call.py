@@ -24,3 +24,9 @@ def synchronized_call(func: Callable, *args, **kwargs):
         __thread.join(timeout=None)
         return __res
     return func(*args, **kwargs)
+
+
+def sync_call(func: Callable):
+    def wrapper(*args, **kwargs):
+        return synchronized_call(func, *args, **kwargs)
+    return wrapper

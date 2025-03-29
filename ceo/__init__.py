@@ -1,5 +1,7 @@
 import logging
 
+# noinspection PyUnresolvedReferences
+from .util.mcp_session import StdioMcpConfig
 from .brain.lm import (
     get_openai_model,
     get_dashscope_model,
@@ -7,10 +9,11 @@ from .brain.lm import (
 )
 from .brain.agent import Agent
 from .brain.mcp_agent import McpAgent
-from .ability import Ability, AgenticAbility, McpAbility
+from .ability import Ability, McpAbility, AgenticAbility
 from .util.agentic import agentic
 from .util.ability import ability
-from .util.synchronized_call import synchronized_call
+from .util.synchronized_call import synchronized_call, sync_call
+from .util.mcp_session import mcp_session
 from .enum import Personality
 
 __AUTHOR__ = '吴子豪 / Vortez Wohl'
