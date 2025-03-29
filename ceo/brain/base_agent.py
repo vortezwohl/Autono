@@ -10,7 +10,7 @@ from typing import Callable
 from langchain_core.language_models import BaseChatModel
 
 from ceo.ability.agentic_ability import Ability, PREFIX as AGENTIC_ABILITY_PREFIX
-from ceo.ability.base_mcp_ability import BaseMcpAbility
+from ceo.ability.mcp_ability import McpAbility
 from ceo.message.all_done_message import AllDoneMessage
 from ceo.prompt import (
     SchedulerPrompt,
@@ -99,7 +99,7 @@ class BaseAgent:
         return self._introduction
 
     def grant_ability(self, ability: Callable | Ability, update_introduction: bool = True):
-        abilities_except_mcp = [_a for _a in self._abilities if not isinstance(_a, BaseMcpAbility)]
+        abilities_except_mcp = [_a for _a in self._abilities if not isinstance(_a, McpAbility)]
         if isinstance(ability, Ability):
             for _ability in abilities_except_mcp:
                 both_agentic = (_ability.name.startswith(AGENTIC_ABILITY_PREFIX)
@@ -128,7 +128,7 @@ class BaseAgent:
         self.introduce(update=(prev_size != len(self.abilities)))
 
     def deprive_ability(self, ability: Callable | Ability, update_introduction: bool = True):
-        abilities_except_mcp = [_a for _a in self._abilities if not isinstance(_a, BaseMcpAbility)]
+        abilities_except_mcp = [_a for _a in self._abilities if not isinstance(_a, McpAbility)]
         removed = False
         if not isinstance(ability, Ability):
             ability = Ability(ability)

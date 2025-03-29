@@ -6,8 +6,8 @@ from .brain.lm import (
     get_deepseek_model
 )
 from .brain.agent import Agent
-from .brain.stdio_mcp_agent import StdioMcpAgent
-from .ability import Ability, AgenticAbility, StdioMcpAbility
+from .brain.mcp_agent import McpAgent
+from .ability import Ability, AgenticAbility, McpAbility
 from .util.agentic import agentic
 from .util.ability import ability
 from .util.synchronized_call import synchronized_call
