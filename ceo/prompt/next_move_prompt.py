@@ -210,9 +210,9 @@ class NextMovePrompt(Prompt):
                     tmp_prompt = Prompt.construct_prompt(tmp_prompt, '')
                     continue
                 if (ability_name.startswith(AGENTIC_ABILITY_PREFIX)
-                        or MISSION_COMPLETE in ability_name or ability_name in MISSION_COMPLETE
-                        or MISSION_FAILED in ability_name or ability_name in MISSION_FAILED
-                        or MAKE_FINAL_RESPONSE in ability_name or ability_name in MAKE_FINAL_RESPONSE):
+                        or MISSION_COMPLETE in ability_name
+                        or MISSION_FAILED in ability_name
+                        or MAKE_FINAL_RESPONSE in ability_name):
                     break
                 _ability = None
                 _wrong_param = False
