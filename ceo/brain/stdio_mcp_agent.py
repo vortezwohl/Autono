@@ -1,8 +1,8 @@
 from collections import OrderedDict
 
+from typing_extensions import Callable, override
 from langchain_core.language_models import BaseChatModel
 from mcp import StdioServerParameters, stdio_client, ClientSession
-from typing_extensions import Callable, override
 
 from ceo.ability.agentic_ability import Ability
 from ceo.ability.stdio_mcp_ability import StdioMcpAbility
