@@ -1,3 +1,4 @@
+import abc
 import json
 
 from typing_extensions import Callable
@@ -10,6 +11,7 @@ class BaseAbility(Callable):
         self._parameters = parameters
         self._returns = returns
 
+    @abc.abstractmethod
     def __call__(self, *args, **kwargs): ...
 
     def __repr__(self):

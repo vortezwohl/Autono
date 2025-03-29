@@ -3,7 +3,6 @@ from typing_extensions import override
 from mcp import ClientSession
 from mcp.types import Tool, CallToolResult
 
-from ceo.util.synchronized_call import synchronized_call
 from ceo.ability.base_ability import BaseAbility
 
 DEFAULT_RETURNS = "<class 'str'>"
@@ -32,8 +31,8 @@ class McpAbility(BaseAbility):
         return await self.session.call_tool(name=self.name, arguments=kwargs)
 
     @override
-    def __call__(self, *args, **kwargs):
-        _res = synchronized_call(self._call_tool, *args, **kwargs)
+    async def __call__(self, *args, **kwargs):
+        _res = await self._call_tool(*args, **kwargs)
         _status = 'SUCCESSFUL' if not _res.isError else 'FAILED'
         return (f'McpAbility(mcp_tool="{self.name}") was {_status}.\n'
                 f'Result: "{_res.content}"')
