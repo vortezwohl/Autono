@@ -25,6 +25,8 @@ class Ability(BaseAbility):
             _description = _description.get('description', _description)
         except json.decoder.JSONDecodeError:
             _description = doc_str
+        except AttributeError:
+            _description = doc_str
         super().__init__(
             name=function.__name__,
             description=_description,
