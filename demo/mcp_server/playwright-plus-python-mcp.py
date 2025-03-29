@@ -57,6 +57,16 @@ async def handle_list_tools() -> list[types.Tool]:
     """
     return [
         types.Tool(
+            name="playwright_new_session",
+            description="Create a new browser session",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "url": {"type": "string", "description": "Initial URL to navigate to"}
+                }
+            }
+        ),
+        types.Tool(
             name="playwright_navigate",
             description="Navigate to a URL,thip op will auto create a session",
             inputSchema={
