@@ -11,6 +11,7 @@ from collections import OrderedDict
 from langchain_core.language_models import BaseChatModel
 
 from ceo.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
+from ceo.ability.base_ability import BaseAbility
 from ceo.brain.base_agent import BaseAgent
 from ceo.brain.hook.before_action_taken import BeforeActionTaken
 from ceo.brain.hook.after_action_taken import AfterActionTaken
@@ -91,6 +92,10 @@ class Agent(BaseAgent, MemoryAugment):
         return self.reposition()
 
     @override
+    def execute(self, args: dict, action: BaseAbility) -> AfterActionTakenMessage:
+        return ExecutorPrompt(action=action, args=args).invoke(self.brain)
+
+    @override
     def just_do_it(self, *args, **kwargs) -> AllDoneMessage:
         __after_action_taken_hook: AfterActionTaken | Callable = BaseHook.do_nothing()
         __before_action_taken_hook: BeforeActionTaken | Callable = BaseHook.do_nothing()
@@ -130,7 +135,7 @@ class Agent(BaseAgent, MemoryAugment):
                             'before_action_taken_hook': __before_action_taken_hook,
                             'after_action_taken_hook': __after_action_taken_hook
                         }
-                    __after_execution_msg = ExecutorPrompt(args=args, action=action).invoke(model=self._model)
+                    __after_execution_msg = self.execute(args=args, action=action)
                     self.memorize(__after_action_taken_hook(self, __after_execution_msg))
                     self._act_count += 1
                     continue
