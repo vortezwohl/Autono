@@ -18,7 +18,7 @@ from .enum import Personality
 
 __AUTHOR__ = '吴子豪 / Vortez Wohl'
 __EMAIL__ = 'vortez.wohl@gmail.com'
-__VERSION__ = '0.12.3-preview'
+__VERSION__ = '0.13.0-preview'
 __GITHUB__ = 'https://github.com/vortezwohl'
 __BLOG__ = 'https://vortezwohl.github.io'
 
