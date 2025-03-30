@@ -74,7 +74,7 @@ date = {2024-10-25}
     Download .whl first then run
 
     ```shell
-    pip install ./ceo_py-x.x.x-py3-none-any.whl
+    pip install git+https://github.com/vortezwohl/CEO-Agentic-AI-Framework.git
     ```
 
 ## Quick Start
@@ -88,7 +88,7 @@ To start building your own agent, follow the steps listed.
     OPENAI_API_KEY=sk-...
     ```
 
-2. bring in SDKs from `CEO`
+2. import required dependencies
 
     - `Agent` lets you instantiate an agent.
 
@@ -182,6 +182,72 @@ To start building your own agent, follow the steps listed.
     ```
 
 > `ceo` also supports multi-agent collaboration scenario, declare a function as agent calling ability with `@agentic(agent: Agent)`, then grant it to an agent. [See example](#multi-agent).
+
+## Integration with [MCP](https://github.com/modelcontextprotocol)
+
+I provide `McpAgent` to support tool calls based on the MCP protocol. Below is a brief guide to integrating `McpAgent` with `mcp.stdio_client`:
+
+1. import required dependencies
+
+    - `McpAgent` allows you to instantiate an agent capable of accessing MCP tools.
+
+    - `StdioMcpConfig` is an alias for `mcp.client.stdio.StdioServerParameters` and serves as the MCP server connection configuration.
+
+    - `@mcp_session(mcp_config: StdioMcpConfig)` allows you to declare a function as an MCP session.
+
+    - `sync_call` allows you to synchronizedly call a coroutine function.
+
+    ```python
+    from ceo import (
+        McpAgent,
+        get_openai_model,
+        StdioMcpConfig,
+        mcp_session,
+        sync_call
+    )
+    ```
+
+2. create an MCP session
+
+    A function decorated with `@mcp_session` will receive an MCP session instance as its first parameter. A function can be decorated with multiple `@mcp_session` decorators to access sessions for different MCP servers.
+
+    ```python
+    @sync_call
+    @mcp_session(stdio_mcp_config)
+    async def run(session, request: str) -> str:
+        ...
+    ```
+
+3. create an `McpAgent` instance within the MCP session
+
+    After creating `McpAgent`, you need to call the `fetch_abilities()` method to retrieve tool configurations from the MCP server.
+
+    ```python
+    @sync_call
+    @mcp_session(stdio_mcp_config)
+    async def run(session, request: str) -> str:
+        mcp_agent = await McpAgent(session=session, brain=model).fetch_abilities()
+        ...
+    ```
+
+4. assign tasks to the `McpAgent` instance and await execution result
+
+    ```python
+    @sync_call
+    @mcp_session(stdio_mcp_config)
+    async def run(session, request: str) -> str:
+        mcp_agent = await McpAgent(session=session, brain=model).fetch_abilities()
+        result = await mcp_agent.assign(request).just_do_it()
+        return result.conclusion
+    ```
+
+5. call the function
+
+    ```python
+    if __name__ == '__main__':
+        ret = run(request='What can you do?')
+        print(ret)
+    ```
 
 ## Observability
 
