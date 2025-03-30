@@ -71,7 +71,7 @@ date = {2024-10-25}
 
 - From [Github](https://github.com/vortezwohl/CEO/releases)
 
-    Download .whl first then run
+    Get access to unreleased features.
 
     ```shell
     pip install git+https://github.com/vortezwohl/CEO-Agentic-AI-Framework.git
