@@ -5,6 +5,9 @@
     <p style="font-weight: 200; font-size: 19px">
         An ultra-lightweight agentic AI framework based on the <a href="https://arxiv.org/abs/2210.03629">ReAct</a> paradigm.
     </p>
+    <p style="font-weight: 200; font-size: 19px">
+        <a href="https://github.com/modelcontextprotocol">MCP</a> is currently supported. <a href="#integration-with-mcp">How to use McpAgent</a>.
+    </p>
 </div>
 
 <h4 align="center">
