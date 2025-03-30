@@ -260,6 +260,8 @@ I provide `McpAgent` to support tool calls based on the MCP protocol. Below is a
         print(ret)
     ```
 
+> I also provide the complete MCP agent test script. [See example](#mcp-agent).
+
 ## Observability
 
 To make the working process of agents observable, I provide two hooks, namely `BeforeActionTaken` and `AfterActionTaken`. 
@@ -466,4 +468,136 @@ To start using hooks, follow the steps listed.
         Agent: Tylor, Action taken: AfterActionTakenMessage(ability='write_file', arguments={'filename': 'result.txt', 'content': 'Surface Area: 95910378.2949379 cm²\nVolume: 88322713378.1367 cm³'}, returns='Surface Area: 95910378.2949379 cm²\nVolume: 88322713378.1367 cm³ written to result.txt.', summarization="I used the write_file ability to write the specified content about surface area and volume to a file named 'result.txt'. The result confirms that the content was successfully written to the file.")
         Agent: CEO, Action taken: AfterActionTakenMessage(ability='__AgenticAbility__talk_to_Tylor', arguments={'arguments': 'Ask for a favor.'}, returns='{"success": true, "response": "--THOUGHT-PROCESS--  \\n(Initial calculation) [Calculate radius]: The radius was calculated as \'2762.66390400000\' cm. (--SUCCESS--)  \\n(After: Calculate radius) [Calculate surface area]: The surface area was calculated using the formula \'4 * 3.14159 * (2762.66390400000^2)\', resulting in \'95910378.2949379\'. (--SUCCESS--)  \\n(After: Calculate surface area) [Calculate volume]: The volume was calculated using the formula \'(4/3) * 3.14159 * (2762.66390400000^3)\', resulting in \'88322713378.1367\'. (--SUCCESS--)  \\n(After: Calculate volume) [Write results to file]: The results were successfully written to \'result.txt\'. (--SUCCESS--)  \\n\\nBased on above assessments, here is my conclusion:  \\n--CONCLUSION--  \\nYour request has been fully achieved. The radius was calculated as \'2762.66390400000\' cm, the surface area as \'95910378.2949379\' cm², and the volume as \'88322713378.1367\' cm³. The results were successfully written to \'result.txt\'.  \\n--END--  "}', summarization="I used the __AgenticAbility__talk_to_Tylor ability to ask Tylor for a favor, which involved calculating the radius, surface area, and volume of a sphere. The results were successfully computed and written to 'result.txt'.")
         Result: AllDoneMessage(success=True, conclusion="Your request has been fully achieved. The radius was calculated as '2762.66390400000' cm, the surface area as '95910378.2949379' cm², and the volume as '88322713378.1367' cm³. The results were successfully written to 'result.txt'.", raw_response="--THOUGHT-PROCESS--  \n(Initial calculation) [Calculate radius]: The radius was calculated as '2762.66390400000' cm. (--SUCCESS--)  \n(After: Calculate radius) [Calculate surface area]: The surface area was calculated using the formula '4 * 3.14159 * (2762.66390400000^2)', resulting in '95910378.2949379' cm². (--SUCCESS--)  \n(After: Calculate surface area) [Calculate volume]: The volume was calculated using the formula '(4/3) * 3.14159 * (2762.66390400000^3)', resulting in '88322713378.1367' cm³. (--SUCCESS--)  \n(After: Calculate volume) [Write results to file]: The results were successfully written to 'result.txt'. (--SUCCESS--)  \n\nBased on above assessments, here is my conclusion:  \n--CONCLUSION--  \nYour request has been fully achieved. The radius was calculated as '2762.66390400000' cm, the surface area as '95910378.2949379' cm², and the volume as '88322713378.1367' cm³. The results were successfully written to 'result.txt'.  \n--END--  ", time_used=123.79718699998921, step_count=2)
+        ```
+
+- ### MCP Agent
+
+    1. Ask a browser-use augmented mcp agent to search for and find out what RL is.
+
+        ```python
+        from ceo import (
+            McpAgent,
+            get_openai_model,
+            ability,
+            sync_call,
+            StdioMcpConfig,
+            __BLOG__
+        )
+        from ceo.util.mcp_session import mcp_session
+        from ceo.brain.hook import BeforeActionTaken, AfterActionTaken
+        from ceo.message import BeforeActionTakenMessage, AfterActionTakenMessage
+        from dotenv import load_dotenv
+
+        load_dotenv()
+        model = get_openai_model()
+        stdio_mcp_config = StdioMcpConfig(
+            command='python',
+            args=['./playwright-plus-python-mcp.py'],
+            env=dict(),
+            cwd='./mcp_server'
+        )
+
+
+        @ability(model)
+        def write_file(filename: str, content: str) -> str:
+            with open(filename, 'w', encoding='utf-8') as f:
+                f.write(content)
+            return f'{content} written to {filename}.'
+
+
+        def before_action_taken(agent: McpAgent, message: BeforeActionTakenMessage):
+            print(f'Agent: {agent.name}, Next move: {message.ability.name}')
+            return message
+
+
+        def after_action_taken(agent: McpAgent, message: AfterActionTakenMessage):
+            print(f'Agent: {agent.name}, Action taken: {message.summarization}')
+            return message
+
+
+        @sync_call
+        @mcp_session(stdio_mcp_config)
+        async def run(session, request: str) -> str:
+            mcp_agent = await McpAgent(session=session, brain=model).fetch_abilities()
+            mcp_agent.grant_ability(write_file)
+            result = await mcp_agent.assign(request).just_do_it(
+                BeforeActionTaken(before_action_taken),
+                AfterActionTaken(after_action_taken)
+            )
+            return result.conclusion
+
+
+        if __name__ == '__main__':
+            output_file = 'result.txt'
+            request = (f'What is reinforcement learning? Bing (www.bing.com) it and write down the search results into local file: {output_file}. '
+                    f'Then navigate to {__BLOG__}.')
+            ret = run(request)
+            print(ret)
+
+        ```
+
+        ```
+        # result.txt
+        Reinforcement Learning: An Overview
+        Reinforcement Learning (RL)
+        Key Concepts of Reinforcement Learning
+        Agent: The learner or decision-maker.
+        Agent
+        Environment: Everything the agent interacts with.
+        Environment
+        State: A specific situation in which the agent finds itself.
+        State
+        Action: All possible moves the agent can make.
+        Action
+        Reward: Feedback from the environment based on the action taken
+        1.
+        Reward
+        How Reinforcement Learning Works
+        IBM
+        https://www.ibm.com › think › topics › reinforcement-learning
+        What is reinforcement learning? | IBM
+        2024年3月25日 · In reinforcement learning, an agent learns to make decisions by interacting with an environment. It is used in robotics and other decision-making settings. Reinforcement …
+        2024年3月25日
+        Wikipedia
+        https://en.wikipedia.org › wiki › Reinforcement_learning
+        Reinforcement learning - Wikipedia
+        Overview
+        Principles
+        Exploration
+        Algorithms for control learning
+        Theory
+        Research
+        Comparison of key algorithms
+        Statistical comparison of reinforcement learning algorithms
+        machine learning
+        optimal control
+        intelligent agent
+        take actions
+        maximize a reward
+        three basic machine learning paradigms
+        supervised learning
+        unsupervised learning
+        Wikipedia · CC-BY-SA 许可下的文字
+        · CC-BY-SA 许可下的文字
+        CC-BY-SA 许可
+        预计阅读时间：10 分钟
+        其他用户还问了以下问题
+        What are reinforcement learning algorithms?
+        Reinforcement learning encompasses a variety of algorithms. Some of the most notable include: Q-learning is a model-free, value-based algorithm that learns an action-value function (Q-function) to estimate the expected cumulative reward for taking a given action in a given state.
+        Q-learning
+        What is reinforcement learning? - cudocompute.com
+        cudocompute.com
+        What is reinforcement learning (RL)?
+        Reinforcement learning (RL) is a type of machine learning process that focuses on decision making by autonomous agents. An autonomous agent is any system that can make decisions and act in response to its environment independent of direct instruction by a human user. Robots and self-driving cars are examples of autonomous agents.
+        ```
+
+        ```
+        # stdout
+        Agent: 智能體47239e型號, Next move: playwright_navigate
+        Agent: 智能體47239e型號, Action taken: I utilized the **playwright_navigate** ability to navigate to the URL "https://www.bing.com/search?q=What+is+reinforcement+learning". The result confirms that the navigation was successful, and the page content includes search results related to "reinforcement learning", such as articles from IBM, Wikipedia, and other sources. This operation successfully retrieved the desired webpage content for further processing or analysis.
+        Agent: 智能體47239e型號, Next move: write_file
+        Agent: 智能體47239e型號, Action taken: I used the `write_file` ability to write a detailed overview of Reinforcement Learning into a file named "result.txt". The content included key concepts such as Agent, Environment, State, Action, and Reward, along with additional information from sources like IBM and Wikipedia. The result confirms that the content was successfully written to the specified file.
+        Agent: 智能體47239e型號, Next move: playwright_navigate
+        Agent: 智能體47239e型號, Action taken: I used the playwright_navigate ability to navigate to the URL "https://vortezwohl.github.io". The result confirms that the navigation was successful, and the page content includes text such as "vortezwohl", "About", "Years", "Categories", "Tags", and various blog post titles related to reinforcement learning, machine learning concepts, and other technical topics.
+        Your request has been fully achieved. I searched for "What is reinforcement learning" on Bing, retrieved relevant information, and wrote it into a file named "result.txt". Subsequently, I navigated to the website "https://vortezwohl.github.io", confirming that the navigation was successful and the page content was as expected.
         ```
