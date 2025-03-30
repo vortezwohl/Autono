@@ -209,6 +209,17 @@ I provide `McpAgent` to support tool calls based on the MCP protocol. Below is a
 
 2. create an MCP session
 
+    You can create a connection configuration for your MCP server with `StdioMcpConfig`.
+
+    ```python
+    stdio_mcp_config = StdioMcpConfig(
+        command='python',
+        args=['./my_stdio_mcp_server.py'],
+        env=dict(),
+        cwd='./mcp_servers'
+    )
+    ```
+
     A function decorated with `@mcp_session` will receive an MCP session instance as its first parameter. A function can be decorated with multiple `@mcp_session` decorators to access sessions for different MCP servers.
 
     ```python
