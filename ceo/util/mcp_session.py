@@ -28,7 +28,7 @@ class SseMcpConfig(BaseMcpConfig):
     url: str
     headers: dict[str, Any] | None = None
     timeout: float = 5
-    sse_read_timeout: float = 60 * 5
+    sse_read_timeout: float = 30 * 5
 
 
 @dataclasses.dataclass
