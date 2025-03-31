@@ -26,7 +26,7 @@ from .util.mcp_session import (
 
 __AUTHOR__ = '吴子豪 / Vortez Wohl'
 __EMAIL__ = 'vortez.wohl@gmail.com'
-__VERSION__ = '0.13.0-preview'
+__VERSION__ = '0.13.1'
 __GITHUB__ = 'https://github.com/vortezwohl'
 __BLOG__ = 'https://vortezwohl.github.io'
 
