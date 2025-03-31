@@ -34,6 +34,7 @@ setuptools.setup(
         'langchain-openai>=0.2.3',
         'openai>=1.59.3',
         'dashscope>=1.20.14',
+        'websockets>=15.0.1',
         'mcp>=1.6.0'
     ],
     entry_points={},
