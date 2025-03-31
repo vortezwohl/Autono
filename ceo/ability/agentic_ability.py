@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from typing_extensions import override
 
-from ceo.ability import Ability
+from ceo.ability.ability import Ability
 from ceo.brain.memory_augment import MemoryAugment
 
 PREFIX = '__AgenticAbility__'
@@ -63,8 +63,7 @@ class AgenticAbility(Ability):
         super().__init__(self)
         log.debug(f'Agent dispatcher generated. {self.__name__}: {self.__doc__}')
 
-    @override
-    def __call__(self, *args, **kwargs) -> str:
+    def relay(self, *args, **kwargs) -> tuple:
         _do_nothing = 'Do nothing.'
         request = kwargs.get('request', _do_nothing)
         request_by_step = kwargs.get('request_by_step', _do_nothing)
@@ -77,4 +76,8 @@ class AgenticAbility(Ability):
             after_action_taken_hook = BaseHook.do_nothing()
         self._agent.relay(request_by_step=request_by_step, request=request)
         self._agent.bring_in_memory(memory)
-        return self._agent.just_do_it(before_action_taken_hook, after_action_taken_hook).response_for_agent
+        return before_action_taken_hook, after_action_taken_hook
+
+    @override
+    def __call__(self, *args, **kwargs) -> str:
+        return self._agent.just_do_it(*self.relay(*args, **kwargs)).response_for_agent
