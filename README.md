@@ -212,25 +212,44 @@ I provide `McpAgent` to support tool calls based on the MCP protocol. Below is a
 
 2. create an MCP session
 
-    You can create a connection configuration for your MCP server with `StdioMcpConfig`.
+    - To connect with a stdio based MCP server, use `StdioMcpConfig`.
 
-    ```python
-    stdio_mcp_config = StdioMcpConfig(
-        command='python',
-        args=['./my_stdio_mcp_server.py'],
-        env=dict(),
-        cwd='./mcp_servers'
-    )
-    ```
+        ```python
+        mcp_config = StdioMcpConfig(
+            command='python',
+            args=['./my_stdio_mcp_server.py'],
+            env=dict(),
+            cwd='./mcp_servers'
+        )
+        ```
 
-    A function decorated with `@mcp_session` will receive an MCP session instance as its first parameter. A function can be decorated with multiple `@mcp_session` decorators to access sessions for different MCP servers.
+        > A function decorated with `@mcp_session` will receive an MCP session instance as its first parameter. A function can be decorated with multiple `@mcp_session` decorators to access sessions for different MCP servers.
 
-    ```python
-    @sync_call
-    @mcp_session(stdio_mcp_config)
-    async def run(session, request: str) -> str:
-        ...
-    ```
+        ```python
+        @sync_call
+        @mcp_session(mcp_config)
+        async def run(session, request: str) -> str:
+            ...
+        ```
+
+    - To connect via HTTP with a SSE based MCP server, just provide the URL.
+
+        ```python
+        @sync_call
+        @mcp_session('http://localhost:8000/sse')
+        async def run(session, request: str) -> str:
+            ...
+        ```
+    
+    - To connect via websocket with a WS based MCP server, provide the URL.
+
+        ```python
+        @sync_call
+        @mcp_session('ws://localhost:8000/message')
+        async def run(session, request: str) -> str:
+            ...
+        ```
+
 
 3. create an `McpAgent` instance within the MCP session
 
@@ -238,7 +257,7 @@ I provide `McpAgent` to support tool calls based on the MCP protocol. Below is a
 
     ```python
     @sync_call
-    @mcp_session(stdio_mcp_config)
+    @mcp_session(mcp_config)
     async def run(session, request: str) -> str:
         mcp_agent = await McpAgent(session=session, brain=model).fetch_abilities()
         ...
@@ -248,7 +267,7 @@ I provide `McpAgent` to support tool calls based on the MCP protocol. Below is a
 
     ```python
     @sync_call
-    @mcp_session(stdio_mcp_config)
+    @mcp_session(mcp_config)
     async def run(session, request: str) -> str:
         mcp_agent = await McpAgent(session=session, brain=model).fetch_abilities()
         result = await mcp_agent.assign(request).just_do_it()
