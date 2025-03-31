@@ -13,7 +13,7 @@ class McpAgenticAbility(AgenticAbility):
     @override
     async def __call__(self, *args, **kwargs) -> str:
         if inspect.iscoroutinefunction(self._agent.just_do_it):
-            all_done = await self._agent.just_do_it(*self.relay(*args, **kwargs))
+            all_done = await self._agent.just_do_it(*self._relay(*args, **kwargs))
         else:
-            all_done = self._agent.just_do_it(*self.relay(*args, **kwargs))
+            all_done = self._agent.just_do_it(*self._relay(*args, **kwargs))
         return all_done.response_for_agent

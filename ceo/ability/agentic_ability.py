@@ -36,24 +36,6 @@ class AgenticAbility(Ability):
                         f"and then decide whether to initiates a conversation with {agent.name} "
                         "according to its abilities.",
                 "parameters": [],
-                # "parameters": [{
-                #     "request": {
-                #         "name": "request",
-                #         "type": "str",
-                #         "description": f"A brief instruction to be processed by {agent.name}."
-                #     },
-                #     "request_by_step": {
-                #         "name": "request_by_step",
-                #         "type": "str",
-                #         "description": "A comprehensive, precise and exact instruction "
-                #                        f"to be processed by {agent.name}."
-                #     },
-                #     "memory": {
-                #         "name": "memory",
-                #         "type": "dict",
-                #         "description": "/"
-                #     }
-                # }],
                 "returns": {
                     "type": "str",
                     "description": f"{agent.name}'s response to your instruction."
@@ -63,7 +45,7 @@ class AgenticAbility(Ability):
         super().__init__(self)
         log.debug(f'Agent dispatcher generated. {self.__name__}: {self.__doc__}')
 
-    def relay(self, *args, **kwargs) -> tuple:
+    def _relay(self, *args, **kwargs) -> tuple:
         _do_nothing = 'Do nothing.'
         request = kwargs.get('request', _do_nothing)
         request_by_step = kwargs.get('request_by_step', _do_nothing)
@@ -80,4 +62,4 @@ class AgenticAbility(Ability):
 
     @override
     def __call__(self, *args, **kwargs) -> str:
-        return self._agent.just_do_it(*self.relay(*args, **kwargs)).response_for_agent
+        return self._agent.just_do_it(*self._relay(*args, **kwargs)).response_for_agent
