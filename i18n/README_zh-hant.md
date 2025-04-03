@@ -39,13 +39,14 @@
 如果您正在將 `CEO` 框架整合到您的研究中，請務必正確**引用**它，以聲明它對您工作的貢獻.
 
 ```latex
-@software {CEO,
-author = {Zihao Wu},
-title = {CEO: An ultra-lightweight agentic AI framework based on the ReAct paradigm},
-publisher = {Github},
-howpublished = {\url{https://github.com/vortezwohl/CEO-Agentic-AI-Framework}},
-year = {2024},
-date = {2024-10-25}
+@software{Wu_CEO-Autonomous-Agent-Framework_2024,
+author = {Wu, Zihao},
+license = {GPL-3.0},
+month = oct,
+title = {{CEO-Autonomous-Agent-Framework}},
+url = {https://github.com/vortezwohl/CEO-Autonomous-Agent-Framework},
+version = {0.13.1},
+year = {2024}
 }
 ```
 
