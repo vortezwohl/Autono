@@ -3,7 +3,7 @@
         <img src="https://github.com/vortezwohl/Autono/releases/download/autono_icon/autono_logo.png" alt="Autono" height="125">
     </p>
     <p style="font-weight: 200; font-size: 19px">
-        ReActパラダイムに基づく超軽量エージェントAIフレームワーク.
+        基于 <a href="https://arxiv.org/abs/2210.03629">ReAct</a> パラダイムの非常に強靭な自律型エージェントAIフレームワーク.
     </p>
 </div>
 
