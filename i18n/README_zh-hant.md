@@ -154,7 +154,7 @@ year = {2025}
     print(response)
     ```
 
-> `autono` 也支援多智能體協作場景，可用 `@agentic(agent: Agent)`, 宣告一個函數為智能體呼叫能力，然後賦予給一個智能體。[查看示例](#多智能體協作)。
+> `autono` 也支援多智能體協作場景，可用 `@agentic(agent: Agent)`, 宣告一個函數為智能體呼叫能力，然後賦予給一個智能體。[查看示例](https://github.com/vortezwohl/Autono/blob/main/demo/multi_agent.py)。
 
 ## 可觀測性
 
