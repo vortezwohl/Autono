@@ -11,13 +11,13 @@ setuptools.setup(
     version='1.0.0',
     author="vortezwohl",
     author_email="vortez.wohl@gmail.com",
-    description="An ultra-lightweight agentic AI framework based on the ReAct paradigm.",
+    description="A ReAct-Based Highly Robust Autonomous Agent Framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
     license=license_content,
-    url="https://github.com/vortezwohl/CEO",
+    url="https://github.com/vortezwohl/Autono",
     project_urls={
-        "Bug Tracker": "https://github.com/vortezwohl/CEO/issues",
+        "Bug Tracker": "https://github.com/vortezwohl/Autono/issues",
     },
     classifiers=[
         "Programming Language :: Python :: 3",
