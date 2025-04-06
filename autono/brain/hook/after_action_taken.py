@@ -2,8 +2,8 @@ from typing import Callable
 
 from typing_extensions import override
 
-from ceo.brain.hook.base_hook import BaseHook
-from ceo.message.after_action_taken_message import AfterActionTakenMessage
+from autono.brain.hook.base_hook import BaseHook
+from autono.message.after_action_taken_message import AfterActionTakenMessage
 
 
 class AfterActionTaken(BaseHook):

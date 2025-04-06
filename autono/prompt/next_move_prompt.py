@@ -4,13 +4,13 @@ from collections import OrderedDict
 
 from langchain_core.language_models import BaseChatModel
 
-from ceo.ability import Ability
-from ceo.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
-from ceo.message.before_action_taken_message import BeforeActionTakenMessage
-from ceo.prompt.prompt import Prompt
-from ceo.exception.too_dumb_exception import TooDumbException
+from autono.ability import Ability
+from autono.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
+from autono.message.before_action_taken_message import BeforeActionTakenMessage
+from autono.prompt.prompt import Prompt
+from autono.exception.too_dumb_exception import TooDumbException
 
-log = logging.getLogger('ceo.prompt')
+log = logging.getLogger('autono.prompt')
 
 SEPARATOR = '--SEP--'
 END = '--END--'

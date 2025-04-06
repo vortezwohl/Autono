@@ -9,18 +9,18 @@ from typing import Callable
 
 from langchain_core.language_models import BaseChatModel
 
-from ceo.ability.agentic_ability import Ability, PREFIX as AGENTIC_ABILITY_PREFIX
-from ceo.ability.base_ability import BaseAbility
-from ceo.ability.mcp_ability import McpAbility
-from ceo.message import AfterActionTakenMessage
-from ceo.message.all_done_message import AllDoneMessage
-from ceo.prompt import (
+from autono.ability.agentic_ability import Ability, PREFIX as AGENTIC_ABILITY_PREFIX
+from autono.ability.base_ability import BaseAbility
+from autono.ability.mcp_ability import McpAbility
+from autono.message import AfterActionTakenMessage
+from autono.message.all_done_message import AllDoneMessage
+from autono.prompt import (
     SchedulerPrompt,
     RequestResolverPrompt,
     SelfIntroducePrompt
 )
 
-log = logging.getLogger('ceo')
+log = logging.getLogger('autono')
 SYSTEM_ABILITY_PREFIX = '__SystemAbility__'
 
 

@@ -26,11 +26,11 @@ from .util.mcp_session import (
 
 __AUTHOR__ = '吴子豪 / Vortez Wohl'
 __EMAIL__ = 'vortez.wohl@gmail.com'
-__VERSION__ = '0.13.1'
+__VERSION__ = '1.0.0'
 __GITHUB__ = 'https://github.com/vortezwohl'
 __BLOG__ = 'https://vortezwohl.github.io'
 
-logger = logging.getLogger('ceo')
+logger = logging.getLogger('autono')
 logger.setLevel(logging.ERROR)
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)
@@ -38,9 +38,9 @@ formatter = logging.Formatter('[%(levelname)s] %(asctime)s %(name)s : %(message)
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
-logger = logging.getLogger('ceo.prompt')
+logger = logging.getLogger('autono.prompt')
 logger.setLevel(logging.ERROR)
-logger = logging.getLogger('ceo.ability')
+logger = logging.getLogger('autono.ability')
 logger.setLevel(logging.ERROR)
-logger = logging.getLogger('ceo.agent')
+logger = logging.getLogger('autono.agent')
 logger.setLevel(logging.ERROR)

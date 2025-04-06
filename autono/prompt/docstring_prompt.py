@@ -6,9 +6,9 @@ from typing import Callable
 
 from langchain_core.language_models import BaseChatModel
 
-from ceo.prompt.prompt import Prompt
+from autono.prompt.prompt import Prompt
 
-log = logging.getLogger('ceo.prompt')
+log = logging.getLogger('autono.prompt')
 
 
 class DocstringPrompt(Prompt):

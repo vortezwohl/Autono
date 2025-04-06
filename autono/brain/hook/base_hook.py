@@ -1,8 +1,8 @@
 from typing import Callable
 
-from ceo.message.base_massage import BaseMessage
-from ceo.brain.base_agent import BaseAgent
-from ceo.util.synchronized_call import synchronized_call
+from autono.message.base_massage import BaseMessage
+from autono.brain.base_agent import BaseAgent
+from autono.util.synchronized_call import synchronized_call
 
 
 class BaseHook(Callable[[BaseAgent, BaseMessage], BaseMessage]):
