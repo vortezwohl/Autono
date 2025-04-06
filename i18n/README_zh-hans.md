@@ -11,8 +11,8 @@
     <p>
         <a href="https://github.com/vortezwohl/Autono/blob/main/README.md">English</a> |
         <a href="https://github.com/vortezwohl/Autono/blob/main/i18n/README_zh-hant.md">繁體中文</a> |
-        <a href="https://github.com/vortezwohl/Autono/blob/main/i18n/README_ja-jp.md">日本語</a> |
-        <b>简体中文</b>
+        <b>简体中文</b> |
+         <a href="https://github.com/vortezwohl/Autono/blob/main/i18n/README_ja-jp.md">日本語</a>
     </p>
 </h4>
 
