@@ -54,7 +54,7 @@ If you are incorporating the `autono` framework into your research, please remem
 如果您正在將 `autono` 框架整合到您的研究中，請務必正確引用它，以聲明它對您工作的貢獻.
 
 ```latex
-@software{Wu_Autono_2024,
+@software{Wu_Autono_2025,
 author = {Wu, Zihao},
 license = {GPL-3.0},
 month = apr,
