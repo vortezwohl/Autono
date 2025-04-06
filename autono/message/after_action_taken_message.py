@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from typing_extensions import override
 
-from ceo.message.base_massage import BaseMessage
+from autono.message.base_massage import BaseMessage
 
 
 @dataclass

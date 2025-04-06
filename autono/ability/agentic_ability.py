@@ -4,15 +4,15 @@ from collections import OrderedDict
 
 from typing_extensions import override
 
-from ceo.ability.ability import Ability
-from ceo.brain.memory_augment import MemoryAugment
+from autono.ability.ability import Ability
+from autono.brain.memory_augment import MemoryAugment
 
 PREFIX = '__AgenticAbility__'
 
-from ceo.brain.hook.after_action_taken import BaseHook
-from ceo.brain.base_agent import BaseAgent
+from autono.brain.hook.after_action_taken import BaseHook
+from autono.brain.base_agent import BaseAgent
 
-log = logging.getLogger('ceo.ability')
+log = logging.getLogger('autono.ability')
 
 
 class AgenticAbility(Ability):
@@ -20,7 +20,7 @@ class AgenticAbility(Ability):
         try:
             _test_mem = agent.memory
         except AttributeError:
-            raise TypeError("The 'agent' of AgenticAbility should be instance of 'ceo.Agent'.")
+            raise TypeError("The 'agent' of AgenticAbility should be instance of 'autono.Agent'.")
         self._agent = agent
         self.__name__ = f'{PREFIX}talk_to_{agent.name}'
         self.__doc__ = json.dumps({

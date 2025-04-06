@@ -1,11 +1,11 @@
-from ceo import (
+from autono import (
     Agent,
     Personality,
     get_openai_model,
     ability
 )
-from ceo.brain.hook import BeforeActionTaken, AfterActionTaken
-from ceo.message import BeforeActionTakenMessage, AfterActionTakenMessage
+from autono.brain.hook import BeforeActionTaken, AfterActionTaken
+from autono.message import BeforeActionTakenMessage, AfterActionTakenMessage
 from sympy import simplify
 from dotenv import load_dotenv
 
@@ -36,10 +36,10 @@ def after_action_taken(agent: Agent, message: AfterActionTakenMessage):
 
 
 if __name__ == '__main__':
-    ceo = Agent(abilities=[calculator, write_file], brain=get_openai_model(), name='CEO', personality=Personality.INQUISITIVE)
+    autono_agent = Agent(abilities=[calculator, write_file], brain=get_openai_model(), name='Autono', personality=Personality.INQUISITIVE)
     radius = '(10.01 * 10.36 * 3.33 / 2 * 16)'  # 2762.663904
     pi = 3.14159
     output_file = 'result.txt'
     request = f"Here is a sphere with radius of {radius} cm and pi here is {pi}, find the area and volume respectively then write the results into a file called '{output_file}'."
-    result = ceo.assign(request).just_do_it(BeforeActionTaken(before_action_taken), AfterActionTaken(after_action_taken))  # area = 95910378.2949379, volume = 88322713378.13666
+    result = autono_agent.assign(request).just_do_it(BeforeActionTaken(before_action_taken), AfterActionTaken(after_action_taken))  # area = 95910378.2949379, volume = 88322713378.13666
     print(f'Result: {result}')

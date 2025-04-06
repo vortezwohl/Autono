@@ -3,8 +3,8 @@ import json
 
 from typing_extensions import Callable, override
 
-from ceo.util.synchronized_call import synchronized_call
-from ceo.ability.base_ability import BaseAbility
+from autono.util.synchronized_call import synchronized_call
+from autono.ability.base_ability import BaseAbility
 
 
 class Ability(BaseAbility):

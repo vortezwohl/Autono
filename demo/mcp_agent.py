@@ -1,4 +1,4 @@
-from ceo import (
+from autono import (
     McpAgent,
     get_openai_model,
     ability,
@@ -6,9 +6,9 @@ from ceo import (
     StdioMcpConfig,
     __BLOG__
 )
-from ceo.util.mcp_session import mcp_session
-from ceo.brain.hook import BeforeActionTaken, AfterActionTaken
-from ceo.message import BeforeActionTakenMessage, AfterActionTakenMessage
+from autono.util.mcp_session import mcp_session
+from autono.brain.hook import BeforeActionTaken, AfterActionTaken
+from autono.message import BeforeActionTakenMessage, AfterActionTakenMessage
 from dotenv import load_dotenv
 
 load_dotenv()

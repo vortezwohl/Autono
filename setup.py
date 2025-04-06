@@ -7,8 +7,8 @@ with open("LICENSE", "r", encoding="utf-8") as fh:
     license_content = fh.read()
 
 setuptools.setup(
-    name="ceo-py",
-    version='0.13.1',
+    name="autono",
+    version='1.0.0',
     author="vortezwohl",
     author_email="vortez.wohl@gmail.com",
     description="An ultra-lightweight agentic AI framework based on the ReAct paradigm.",

@@ -2,8 +2,8 @@ from dataclasses import dataclass
 
 from typing_extensions import override
 
-from ceo.ability.ability import Ability
-from ceo.message.base_massage import BaseMessage
+from autono.ability.ability import Ability
+from autono.message.base_massage import BaseMessage
 
 
 @dataclass

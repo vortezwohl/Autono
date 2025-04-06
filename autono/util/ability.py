@@ -6,11 +6,11 @@ from typing import Callable
 
 from langchain_core.language_models import BaseChatModel
 
-from ceo.brain.lm import get_openai_model
-from ceo.prompt import DocstringPrompt
-from ceo.exception.not_a_regular_function_exception import NotARegularFunctionException
+from autono.brain.lm import get_openai_model
+from autono.prompt import DocstringPrompt
+from autono.exception.not_a_regular_function_exception import NotARegularFunctionException
 
-log = logging.getLogger('ceo.ability')
+log = logging.getLogger('autono.ability')
 
 
 def ability(brain: BaseChatModel, cache: bool = True, cache_dir: str = ''):

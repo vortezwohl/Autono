@@ -6,18 +6,18 @@ from typing_extensions import Callable, override
 from langchain_core.language_models import BaseChatModel
 from mcp import ClientSession
 
-from ceo.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
-from ceo.ability.agentic_ability import Ability
-from ceo.ability.base_ability import BaseAbility
-from ceo.ability.mcp_ability import McpAbility
-from ceo.brain.agent import Agent
-from ceo.brain.hook import AfterActionTaken, BeforeActionTaken
-from ceo.brain.hook.base_hook import BaseHook
-from ceo.enum import Personality
-from ceo.message import AllDoneMessage, AfterActionTakenMessage, BeforeActionTakenMessage
-from ceo.prompt import ExecutorPrompt, IntrospectionPrompt, NextMovePrompt
+from autono.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
+from autono.ability.agentic_ability import Ability
+from autono.ability.base_ability import BaseAbility
+from autono.ability.mcp_ability import McpAbility
+from autono.brain.agent import Agent
+from autono.brain.hook import AfterActionTaken, BeforeActionTaken
+from autono.brain.hook.base_hook import BaseHook
+from autono.enum import Personality
+from autono.message import AllDoneMessage, AfterActionTakenMessage, BeforeActionTakenMessage
+from autono.prompt import ExecutorPrompt, IntrospectionPrompt, NextMovePrompt
 
-log = logging.getLogger('ceo')
+log = logging.getLogger('autono')
 
 
 class McpAgent(Agent):

@@ -1,11 +1,11 @@
-from ceo import (
+from autono import (
     Agent,
     Personality,
     get_openai_model,
     ability
 )
-from ceo.brain.hook import BeforeActionTaken, AfterActionTaken
-from ceo.message import BeforeActionTakenMessage, AfterActionTakenMessage
+from autono.brain.hook import BeforeActionTaken, AfterActionTaken
+from autono.message import BeforeActionTakenMessage, AfterActionTakenMessage
 from sympy import simplify
 from dotenv import load_dotenv
 import pyttsx3

@@ -3,7 +3,7 @@ from typing_extensions import override
 from mcp import ClientSession
 from mcp.types import Tool, CallToolResult
 
-from ceo.ability.base_ability import BaseAbility
+from autono.ability.base_ability import BaseAbility
 
 DEFAULT_RETURNS = "<class 'str'>"
 NONE = '/'

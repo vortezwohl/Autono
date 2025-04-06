@@ -10,18 +10,18 @@ from collections import OrderedDict
 
 from langchain_core.language_models import BaseChatModel
 
-from ceo.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
-from ceo.ability.base_ability import BaseAbility
-from ceo.brain.base_agent import BaseAgent
-from ceo.brain.hook.before_action_taken import BeforeActionTaken
-from ceo.brain.hook.after_action_taken import AfterActionTaken
-from ceo.brain.hook.base_hook import BaseHook
-from ceo.brain.memory_augment import MemoryAugment
-from ceo.enum.Personality import Personality
-from ceo.message.all_done_message import AllDoneMessage
-from ceo.message.before_action_taken_message import BeforeActionTakenMessage
-from ceo.message.after_action_taken_message import AfterActionTakenMessage
-from ceo.prompt import (
+from autono.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
+from autono.ability.base_ability import BaseAbility
+from autono.brain.base_agent import BaseAgent
+from autono.brain.hook.before_action_taken import BeforeActionTaken
+from autono.brain.hook.after_action_taken import AfterActionTaken
+from autono.brain.hook.base_hook import BaseHook
+from autono.brain.memory_augment import MemoryAugment
+from autono.enum.Personality import Personality
+from autono.message.all_done_message import AllDoneMessage
+from autono.message.before_action_taken_message import BeforeActionTakenMessage
+from autono.message.after_action_taken_message import AfterActionTakenMessage
+from autono.prompt import (
     NextMovePrompt,
     ExecutorPrompt,
     IntrospectionPrompt
@@ -31,7 +31,7 @@ PRUDENT_P = 0.25
 PRUDENT_BETA = 1.45
 INQUISITIVE_P = 0.05
 INQUISITIVE_BETA = 1.25
-log = logging.getLogger('ceo')
+log = logging.getLogger('autono')
 
 
 class Agent(BaseAgent, MemoryAugment):

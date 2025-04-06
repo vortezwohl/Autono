@@ -5,12 +5,12 @@ from collections.abc import Iterator
 
 from langchain_core.language_models import BaseChatModel
 
-from ceo.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
-from ceo.ability.base_ability import BaseAbility
-from ceo.message.after_action_taken_message import AfterActionTakenMessage
-from ceo.prompt.prompt import Prompt
+from autono.ability.agentic_ability import PREFIX as AGENTIC_ABILITY_PREFIX
+from autono.ability.base_ability import BaseAbility
+from autono.message.after_action_taken_message import AfterActionTakenMessage
+from autono.prompt.prompt import Prompt
 
-log = logging.getLogger('ceo.prompt')
+log = logging.getLogger('autono.prompt')
 
 
 class ExecutorPrompt(Prompt):

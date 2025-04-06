@@ -1,6 +1,6 @@
 from sympy import simplify
 from dotenv import load_dotenv
-from ceo import (
+from autono import (
     Agent,
     McpAgent,
     Personality,
@@ -11,8 +11,8 @@ from ceo import (
     mcp_session,
     sync_call
 )
-from ceo.brain.hook import BeforeActionTaken, AfterActionTaken
-from ceo.message import BeforeActionTakenMessage, AfterActionTakenMessage
+from autono.brain.hook import BeforeActionTaken, AfterActionTaken
+from autono.message import BeforeActionTakenMessage, AfterActionTakenMessage
 
 load_dotenv()
 model = get_openai_model()

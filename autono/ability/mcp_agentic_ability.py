@@ -2,8 +2,8 @@ import inspect
 
 from typing_extensions import override
 
-from ceo.ability.agentic_ability import AgenticAbility
-from ceo.brain.base_agent import BaseAgent
+from autono.ability.agentic_ability import AgenticAbility
+from autono.brain.base_agent import BaseAgent
 
 
 class McpAgenticAbility(AgenticAbility):
