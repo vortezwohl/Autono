@@ -38,7 +38,19 @@
 
 如果您正在將 `autono` 框架整合到您的研究中，請務必正確**引用**它，以聲明它對您工作的貢獻.
 
-```latex
+```bibtex
+@article{wu2025autono,
+author = {Zihao Wu},
+title = {Autono: A ReAct-Based Highly Robust Autonomous Agent Framework},
+journal = {arXiv preprint},
+year = {2025},
+eprint = {2504.04650},
+archivePrefix = {arXiv},
+primaryClass = {cs.MA},
+url = {https://arxiv.org/abs/2504.04650}
+}
+```
+```bibtex
 @software{Wu_Autono_2025,
 author = {Wu, Zihao},
 license = {GPL-3.0},
