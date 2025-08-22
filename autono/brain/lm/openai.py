@@ -5,7 +5,7 @@ from langchain_core.language_models import BaseChatModel
 
 DEFAULT_TMP = 0.125
 DEFAULT_TOP_P = 0.001
-DEFAULT_GPT = 'gpt-5-nano'
+DEFAULT_GPT = 'gpt-4.1-mini'
 
 
 def get_lm(key: str = None, model_name: str = DEFAULT_GPT, temp: float = DEFAULT_TMP, top_p: float = DEFAULT_TOP_P,
