@@ -28,6 +28,7 @@ setuptools.setup(
     packages=setuptools.find_packages(where="."),
     python_requires=">=3.10",
     install_requires=[
+        'vortezwohl>=0.0.8',
         'langchain>=0.3.14',
         'langchain-core>=0.3.29',
         'langchain-community>=0.3.14',
