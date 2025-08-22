@@ -29,7 +29,7 @@ setuptools.setup(
     python_requires=">=3.10",
     install_requires=[
         'vortezwohl>=0.0.8',
-        'json_repair>=0.50.0',
+        'json-repair>=0.50.0',
         'langchain>=0.3.14',
         'langchain-core>=0.3.29',
         'langchain-community>=0.3.14',
