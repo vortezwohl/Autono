@@ -220,10 +220,14 @@ class NextMovePrompt(Prompt):
                         _ability = ability
                 # parameters fuzzy matching
                 _tmp_args = dict()
+                _deprecated_keys = list()
                 for _k in args.keys():
                     if _k not in _ability.parameters.keys():
                         _fixed_k = levenshtein_distance.rank(_k, list(_ability.parameters.keys()))[0]
                         _tmp_args[_fixed_k] = args[_k]
+                        _deprecated_keys.append(_k)
+                for _k in _deprecated_keys:
+                    if _k in args.keys():
                         del args[_k]
                 args |= _tmp_args
                 break
