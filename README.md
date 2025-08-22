@@ -2,7 +2,17 @@
     <p>
         <img src="https://github.com/vortezwohl/Autono/releases/download/autono_icon/autono_logo.png" alt="Autono" height="125">
     </p>
+    <div align="center">
+        <span>
+            <a href="https://deepwiki.com/vortezwohl/Autono" rel="nofollow">
+                <img src="https://camo.githubusercontent.com/e7d4bb1a32530e373bb53fbe8eea825440ad27c7531d8f144d561acdd20c093a/68747470733a2f2f6465657077696b692e636f6d2f62616467652e737667" alt="Ask DeepWiki" data-canonical-src="https://deepwiki.com/badge.svg" style="max-width: 100%;">
+            </a>
+        </span>
+    </div>
     <p style="font-weight: 800; font-size: 24px; color:rgb(143, 88, 195)">
+        <a href="https://doi.org/10.48550/arXiv.2504.04650" rel="nofollow">
+            <img src="https://arxiv.org/static/browse/0.3.4/images/icons/favicon-32x32.png" alt="Paper", style="max-width: 100%;height: 25px">
+        </a>
         A <a href="https://arxiv.org/abs/2210.03629">ReAct</a> Based Highly Robust Autonomous Agent Framework.
     </p>
     <p style="font-weight: 600; font-size: 16px">
