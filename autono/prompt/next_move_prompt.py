@@ -154,7 +154,6 @@ class NextMovePrompt(Prompt):
                                     f'no more words are allowed after "{END}" pattern. '
                                     f'The "{END}" pattern is absolutely important, do not forget to place it '
                                     'in the end of your response.',
-            "output_example": OUTPUT_EXAMPLE,
             "hint_for_output": 'You must strictly follow the format in <output_format>! '
                                'You should refer to example in <output_example>!',
             "user_request": request,
@@ -167,7 +166,8 @@ class NextMovePrompt(Prompt):
             "limitation_for_ability_output_format": 'The ability should be after the args. '
                                                     'The ability name should be surrounded by "[ ]".',
             "limitation_for_args": f'You must make sure the parameter_names you provide '
-                                   f'for <args> are real and correct according to <abilities>!'
+                                   f'for <args> are real and correct according to <abilities>!',
+            "output_example": OUTPUT_EXAMPLE
         }
         prompt = json.dumps(prompt_dict, ensure_ascii=False)
         super().__init__(prompt, ext_context)
