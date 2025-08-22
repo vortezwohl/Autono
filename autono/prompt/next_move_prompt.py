@@ -1,7 +1,9 @@
 import json
+import json_repair
 import logging
 from collections import OrderedDict
 
+from vortezwohl.nlp import LevenshteinDistance
 from langchain_core.language_models import BaseChatModel
 
 from autono.ability import Ability
@@ -11,6 +13,7 @@ from autono.prompt.prompt import Prompt
 from autono.exception.too_dumb_exception import TooDumbException
 
 log = logging.getLogger('autono.prompt')
+levenshtein_distance = LevenshteinDistance(ignore_case=True)
 
 SEPARATOR = '--SEP--'
 END = '--END--'
@@ -201,38 +204,29 @@ class NextMovePrompt(Prompt):
                     __additional_prompt += f"\n{'-' * 5}\n"
                 tmp_prompt_dict_prompt_str += f"{__additional_prompt}"
                 result = _accurate_action_str
-                args = json.loads(result[result.find('{'):result.rfind('}') + 1].strip())
+                args = json_repair.loads(result[result.find('{'):result.rfind('}') + 1].strip())
                 result = result[result.rfind('}') + 1:]
                 ability_name: str = result[result.find('['):result.rfind(']') + 1].strip()[1:-1]
-                if ability_name not in self.__ability_names:
-                    tmp_prompt = (f'{tmp_prompt_dict_prompt_str}There is no ability called "{ability_name}", '
-                                  f'These abilities are available for you to choose: {self.__ability_names}.')
-                    tmp_prompt = Prompt.construct_prompt(tmp_prompt, '')
-                    continue
+                # ability fuzzy matching, more robustness
+                ability_name = levenshtein_distance.rank(ability_name, self.__ability_names)[0]
                 if (ability_name.startswith(AGENTIC_ABILITY_PREFIX)
                         or MISSION_COMPLETE in ability_name
                         or MISSION_FAILED in ability_name
                         or MAKE_FINAL_RESPONSE in ability_name):
                     break
                 _ability = None
-                _wrong_param = False
-                _wrong_param_names = list()
                 for ability in self.abilities:
                     if ability.name == ability_name:
                         _ability = ability
-                if _ability is not None:
-                    for _k in args.keys():
-                        if _k not in _ability.parameters.keys():
-                            _wrong_param = True
-                            _wrong_param_names.append(_k)
-                if not _wrong_param:
-                    break
-                else:
-                    tmp_prompt = (f'{tmp_prompt_dict_prompt_str}For ability called "{ability_name}", '
-                                  f'these parameter_names are incorrect: {_wrong_param_names}, '
-                                  f"correct parameter_names: {_ability.to_dict().get('parameters_required', [])};")
-                    tmp_prompt = Prompt.construct_prompt(tmp_prompt, '')
-                    continue
+                # parameters fuzzy matching
+                _tmp_args = dict()
+                for _k in args.keys():
+                    if _k not in _ability.parameters.keys():
+                        _fixed_k = levenshtein_distance.rank(_k, list(_ability.parameters.keys()))[0]
+                        _tmp_args[_fixed_k] = args[_k]
+                        del args[_k]
+                args |= _tmp_args
+                break
             tmp_prompt = (f'{self.prompt}Attention_{count}: '
                           f'You must strictly follow the format in <output_format>{count * 2 * exclamation} '
                           f'You should refer to example in <output_example>{count * 2 * exclamation}')
