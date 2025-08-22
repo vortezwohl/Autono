@@ -4,7 +4,7 @@ import langchain_community.chat_models.tongyi
 from langchain_core.language_models import BaseChatModel
 
 DEFAULT_TMP = 0.125
-DEFAULT_TOP_P = 1.00
+DEFAULT_TOP_P = 0.001
 DEFAULT_QWEN = 'qwen-plus'
 
 
