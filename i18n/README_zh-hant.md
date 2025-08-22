@@ -11,7 +11,7 @@
     </p>
     <p style="font-weight: 200; font-size: 19px">
         <a href="https://doi.org/10.48550/arXiv.2504.04650" rel="nofollow">
-            <img src="https://arxiv.org/static/browse/0.3.4/images/icons/favicon-32x32.png" alt="Paper", style="max-width: 100%;height: 15px">
+            <img src="https://arxiv.org/static/browse/0.3.4/images/icons/favicon-32x32.png" alt="Paper", style="max-width: 100%;height: 20px">
         </a>
         一個基於 <a href="https://arxiv.org/abs/2210.03629">ReAct</a> 範式的超輕量高穩健智能體框架.
     </p>
