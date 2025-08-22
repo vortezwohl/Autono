@@ -8,7 +8,7 @@ with open("LICENSE", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="autono",
-    version='1.1.0',
+    version='1.1.1',
     author="vortezwohl",
     author_email="vortez.wohl@gmail.com",
     description="A ReAct-Based Highly Robust Autonomous Agent Framework",
