@@ -20,7 +20,6 @@ END = '--END--'
 MISSION_COMPLETE = '-mission-complete-'
 MISSION_FAILED = '-mission-failed-'
 MAKE_FINAL_RESPONSE = '-make-final-response-'
-
 OUTPUT_EXAMPLE = """
 [step1] In the provided history, events related to the user's request are listed chronologically:
     1. Steve calculated the radius of the sphere using the expression "(3 * 174.9 / 15.9 * 2.77)", resulting in a radius of 91.41 cm.
@@ -80,12 +79,10 @@ class NextMovePrompt(Prompt):
             "precondition": "In <abilities> are abilities you have, and there is a <user_request>. "
                             "<history> shows events happened before you, "
                             "<latest_progress> shows the latest progress of <user_request>.",
-            "instructions_you_must_follow_step_by_step": [{
+            "instructions_you_must_follow_STEP_BY_STEP": [{
                     "step": 1,
                     "action": "List events from <history> and <latest_progress> "
                               "which could be related to <user_request> (respectively and chronologically).",
-                    # "second_action": "Extract and list all information related to <user_request> from <history> "
-                    #                  "formatted one by one respectively.",
                     "additional": "For all details mentioned in <history> about <user_request>, "
                                   "you should preserve them in full, "
                                   "especially specific information with accuracy requirements "
@@ -99,14 +96,14 @@ class NextMovePrompt(Prompt):
                     "limitation_for_step2": "Make it brief, concise and accurate."
                 }, {
                     "step": 3,
-                    "condition": "If the <user_request> has not been fully properly accomplished",
+                    "conditional": "If the <user_request> has not been fully properly accomplished",
                     "action": "Analyse whether your <abilities> can complete the unfinished part of the <user_request>, "
                               "and provide the basis briefly according to information provided in <step_1>."
                 }, {
                     "step": 4,
-                    "condition": "If the <user_request> has not been fully properly accomplished and "
-                                 "there is an ability in your <abilities> "
-                                 "that can further advance the accomplishment of the <user_request> based on <history>.",
+                    "conditional": "If the <user_request> has not been fully properly accomplished and "
+                                   "there is an ability in your <abilities> "
+                                   "that can further advance the accomplishment of the <user_request> based on <history>.",
                     "first_action": "Plan and explain your next move briefly based on <history> "
                                     "for further advancing the <user_request>.",
                     "second_action": "Choose and provide the ability according to your next move"
@@ -116,15 +113,15 @@ class NextMovePrompt(Prompt):
                                     "before you generate arguments, explain why you give these arguments briefly."
                 }, {
                     "step": 5,
-                    "condition": "If the <user_request> has not been fully properly accomplished and "
-                                 "there is no ability in your <abilities> "
-                                 "that can further advance the accomplishment of the <user_request>",
+                    "conditional": "If the <user_request> has not been fully properly accomplished and "
+                                   "there is no ability in your <abilities> "
+                                   "that can further advance the accomplishment of the <user_request>",
                     "action": f'Provide the special ability called "{MISSION_FAILED}" '
                               'with "args:{}".'
                 }, {
                     "step": 6,
-                    "condition": "If the <user_request> has been fully and properly accomplished "
-                                 "according to <history> and <user_request>",
+                    "conditional": "If the <user_request> has been fully and properly accomplished "
+                                   "according to <history> and <user_request>",
                     "action": f'Provide the special ability called "{MISSION_COMPLETE}" '
                               'with "args:{}".'
                 }
@@ -154,8 +151,8 @@ class NextMovePrompt(Prompt):
                                     f'no more words are allowed after "{END}" pattern. '
                                     f'The "{END}" pattern is absolutely important, do not forget to place it '
                                     'in the end of your response.',
-            "hint_for_output": 'You must strictly follow the format in <output_format>! '
-                               'You should refer to example in <output_example>!',
+            "limitation_for_output": 'You must strictly follow the format in <output_format>! '
+                                     'You should refer to example in <output_example>!',
             "user_request": request,
             "history": history,
             "latest_progress": latest_progress,
