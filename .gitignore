@@ -162,3 +162,7 @@ cython_debug/
 .idea/
 .pypirc
 test
+.python-version
+*.lock
+.claude
+.codex

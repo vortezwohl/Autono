@@ -1,0 +1,27 @@
+[project]
+name = "autono"
+version = "1.1.2"
+authors = [{ name = "vortezwohl", email = "vortez.wohl@gmail.com" }]
+description = "A ReAct-Based Highly Robust Autonomous Agent Framework"
+readme = "README.md"
+license = { file = "LICENSE" }
+long_description = { file = "README.md", content-type = "text/markdown" }
+urls = { "Homepage" = "https://github.com/vortezwohl/Autono", "Bug Tracker" = "https://github.com/vortezwohl/Autono/issues" }
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Natural Language :: English"
+]
+dependencies = [
+    'vortezwohl>=0.1.0',
+    'json-repair>=0.50.0',
+    'langchain>=0.3.14',
+    'langchain-core>=0.3.29',
+    'langchain-community>=0.3.14',
+    'langchain-openai>=0.2.3',
+    'openai>=1.59.3',
+    'dashscope>=1.20.14',
+    'websockets>=15.0.1',
+    'mcp>=1.6.0'
+]
