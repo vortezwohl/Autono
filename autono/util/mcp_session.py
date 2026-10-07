@@ -3,6 +3,7 @@ from pathlib import Path
 
 from mcp import StdioServerParameters, ClientSession, stdio_client
 from mcp.client.sse import sse_client
+from mcp.client.streamable_http import streamablehttp_client
 from mcp.client.websocket import websocket_client
 from typing_extensions import Any, Literal
 
@@ -32,6 +33,17 @@ class SseMcpConfig(BaseMcpConfig):
 
 
 @dataclasses.dataclass
+class StreamableHttpMcpConfig(BaseMcpConfig):
+    """Opt-in Streamable HTTP transport; string HTTP URLs still use SSE."""
+
+    url: str
+    headers: dict[str, str] | None = None
+    timeout: float = 30
+    sse_read_timeout: float = 300
+    terminate_on_close: bool = True
+
+
+@dataclasses.dataclass
 class WebsocketMcpConfig(BaseMcpConfig):
     url: str
 
@@ -42,6 +54,11 @@ def mcp_session(mcp_config: BaseMcpConfig | str):
             if isinstance(mcp_config, StdioMcpConfig):
                 async with stdio_client(StdioServerParameters(**mcp_config.to_dict())) as rw:
                     async with ClientSession(*rw) as session:
+                        await session.initialize()
+                        return await func(session, *args, **kwargs)
+            elif isinstance(mcp_config, StreamableHttpMcpConfig):
+                async with streamablehttp_client(**mcp_config.to_dict()) as rw:
+                    async with ClientSession(rw[0], rw[1]) as session:
                         await session.initialize()
                         return await func(session, *args, **kwargs)
             elif isinstance(mcp_config, SseMcpConfig):

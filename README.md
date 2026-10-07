@@ -266,6 +266,41 @@ I provide `McpAgent` to support tool calls based on the MCP protocol. Below is a
             ...
         ```
 
+    - To connect to a Streamable HTTP MCP server, explicitly use `StreamableHttpMcpConfig`.
+      Plain HTTP URL strings continue to use SSE.
+
+        ```python
+        from autono import StreamableHttpMcpConfig
+
+        parallel_config = StreamableHttpMcpConfig(
+            url='https://search.parallel.ai/mcp',
+            headers={'User-Agent': 'Autono/1.1.2 (Parallel Search MCP example)'},
+        )
+
+        @sync_call
+        @mcp_session(parallel_config)
+        async def run(session, request: str) -> str:
+            agent = await McpAgent(session=session, brain=get_openai_model()).fetch_abilities()
+            return (await agent.assign(request).just_do_it()).conclusion
+        ```
+
+      [Parallel Search MCP](https://docs.parallel.ai/integrations/mcp/search-mcp)
+      provides `web_search` and `web_fetch` without a Parallel API key for light use.
+      Anonymous access is rate limited. The agent's language model still requires
+      its own credentials and may incur inference costs.
+      The config also accepts `timeout` (30 seconds), `sse_read_timeout` (300 seconds)
+      and `terminate_on_close` (True). Session and transport cleanup use the MCP SDK.
+
+      Run the [complete example](demo/parallel_search_agent.py) from the repository root
+      after installation, with `OPENAI_API_KEY` set:
+
+        ```shell
+        PYTHONPATH=. python demo/parallel_search_agent.py "Find the latest MCP transport documentation and cite the sources."
+        ```
+
+      Streamable HTTP requires MCP SDK 1.10 or newer in the 1.x series. Autono's
+      existing websocket transport also uses the 1.x SDK API.
+
 
 3. create an `McpAgent` instance within the MCP session
 
